@@ -4,38 +4,55 @@
 {% endblock %}
 {% block body %}
 <div class="d-flex flex-row">
-    <img src="../static/register.jpg" alt="" style="width: 60%;">
-    <form action="" method="post" class="p-5 my-5" style="width: 40%;">
+    <img src="../static/register.jpg" alt="" style="width: 60%; object-fit: contain;">
+    <div class="p-5 my-5" style="width: 40%;">
         <div class="d-flex flex-column justify-content-center pe-5 mb-3">
-        <h2><strong>Register</strong></h2>
-        <p>Silahkan mengisi data yang dibutuhkan untuk mendaftarkan akun</p>
+        <p class="h1"><strong>Register</strong></p>
+        <p>Please fill out this form to complete the registration process.
+            This is a registration form that requires your information to be filled in.</p>
         </div>
         <div class="d-grid me-5 pe-5">
         <div class="mb-3">
-            <input type="email" class="form-control" id="input_user" placeholder="Username">
+            <input type="text" class="form-control" id="input_user" placeholder="Username">
+            <p id="help_user" class="help">
+                For your username, please enter 5-15 English characters, numbers, or the following special characters (._-)
+              </p>
         </div>
         <div class="mb-3">
             <input type="email" class="form-control" id="input_email" placeholder="Email">
         </div>
         <div class="mb-3">
         <input type="password" class="form-control" id="input_pass" placeholder="Password">
+        <p id="help_pass" class="help">
+            For your password, please enter 8-20 English characters, numbers, or the following special characters (!@#$%^&*)
+          </p>
         </div>
         <div class="mb-3">
         <input type="password" class="form-control" id="input_pass2" placeholder="Confirm Password">
+        <p id="help_pass2" class="help">
+            Please enter in your password again
+        </p>
         </div>
         <div class="mb-3">
-            <select id="disabledSelect" class="form-select">
-                <option value="">--Sign in as--</option>
-                <option value="">Normal</option>
-                <option value="">Expert</option>
+            <select id="role_select" class="form-select">
+                <option selected value="" disabled>--Sign in as--</option>
+                <option value="normal">Normal</option>
+                <option value="expert">Expert</option>
             </select>        
+        <p id="help_role" class="help">
+            Select your role
+        </p>
         </div>
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button class="btn btn-primary" onclick="sign_up()">Register</button>
         </div>
           
         
-    </form>
+    </div>
 
 </div>
    
+{% endblock %}
+
+{% block script %}
+    <script src="../static/register.js"></script>
 {% endblock %}

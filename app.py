@@ -38,7 +38,8 @@ def sign_up():
             "password": password_hash,                                  
             "profile_name": username_receive,
             "email":email_receive,
-            "role":role_receive,                           
+            "role":role_receive,
+            "status":"unverified",                           
             "gender":"",
             "academic_info":"",
             "workplace":"",
@@ -73,6 +74,64 @@ def check_dup():
     exists2 = bool(db.expert_users.find_one({'username':username_receive}))
     return jsonify({"result": "success", 'exists':exists+exists2})
 
+@app.route('/login', methods=['GET'])
+def login():
+    msg = request.args.get('msg')
+    return render_template('login.html',msg=msg)
+
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+       # Sign in
+    username_receive = request.form["username_give"]
+    password_receive = request.form["password_give"]
+    pw_hash = hashlib.sha256(password_receive.encode("utf-8")).hexdigest()
+    result = db.normal_users.find_one(
+        {
+            "username": username_receive,
+            "password": pw_hash,
+        }
+    )
+    
+    result2 = db.expert_users.find_one(
+        {
+            "username": username_receive,
+            "password": pw_hash,
+        }
+    )
+    if result:
+        payload = {
+            "id": username_receive,
+            "exp": datetime.utcnow() + timedelta(seconds=60 * 60 * 24),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+        return jsonify(
+            {
+                "result": "success",
+                "token": token,
+            }
+        )
+    elif result2:
+        payload = {
+            "id": username_receive,
+            "exp": datetime.utcnow() + timedelta(seconds=60 * 60 * 24),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+        return jsonify(
+            {
+                "result": "success",
+                "token": token,
+            }
+        )
+    else:
+        return jsonify(
+            {
+                "result": "fail",
+                "msg": "We could not find a user with that id/password combination",
+            }
+        )
+
 if __name__ == '__main__':
-  app.run(host='127.0.0.1', port=8000, debug=True)
+  app.run(host='0.0.0.0', port=5000, debug=True)
  

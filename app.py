@@ -21,6 +21,10 @@ TOKEN_KEY = 'mytoken'
 def index():
     return render_template('index.html')
 
+@app.route('/create_post')
+def create_post():
+    return render_template('create_post.html')
+
 @app.route('/register')
 def register():
     return render_template('register.html')

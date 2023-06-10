@@ -62,7 +62,7 @@
               <div class="dropdown is-right" id="profile_drop">
                 <div class="dropdown-menu">
                   <div class="dropdown-content">
-                    <a href="#" class="dropdown-item">
+                    <a href="/user/{{ user_info.username }}" class="dropdown-item">
                       Profile
                     </a>
                     <a href="#" class="dropdown-item">
@@ -143,7 +143,7 @@
 
       </div>
       <div id="dropmenu_mobile" class="is-hidden-desktop is-hidden-mobile">
-        <a class="buttonsidebar2 ps-5" href="/profile"><span>Profile</span></a>
+        <a class="buttonsidebar2 ps-5" href="/user/{{ user_info.username }}"><span>Profile</span></a>
         <a class="buttonsidebar2 ps-5" href="/edit_profile"><span>Edit Profile</span></a>
         <hr class="separator" style="margin: 0%;">
         <a class="buttonsidebar2 ps-5" onclick="sign_out()"><span>Logout</span></a>
@@ -204,7 +204,7 @@
         }
 
         function sign_out(){
-          $.removeCookie('mytoken', {path : '/'});
+          $.removeCookie('my_token', {path : '/'});
           alert('Signed out');
           window.location.href = '/login'; 
         }

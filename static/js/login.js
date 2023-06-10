@@ -26,7 +26,7 @@ function sign_in() {
       },
       success: function (response) {
         if (response["result"] === "success") {
-          $.cookie("mytoken", response["token"], { path: "/" });
+          $.cookie("my_token", response["token"], { path: "/" });
           alert('Login success!')
           window.location.replace("/");
         } else {

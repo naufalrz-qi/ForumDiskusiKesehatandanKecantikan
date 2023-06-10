@@ -13,14 +13,14 @@
             
             <label class="label">Title</label>
             <div class="control">
-              <input class="input" type="text" placeholder="Title">
+              <input id="input_title" class="input" type="text" placeholder="Title">
             </div>
           </div>
           
           <div class="field">
             <label class="label">Question</label>
             <div class="control">
-              <textarea class="textarea" placeholder="Question"></textarea>
+              <textarea id="input_question" class="textarea" placeholder="Question"></textarea>
             </div>
           </div>
           
@@ -28,17 +28,17 @@
             <label class="label">Topic</label>
             <div class="control">
               <div class="select">
-                <select>
+                <select id="select_topic">
                   <option class="has-text-weight-bold" disabled>--Kesehatan--</option>
-                  <option>Gaya hidup sehat</option>
-                  <option>Nutrisi dan diet</option>
-                  <option>Olahraga dan kebugaran</option>
+                  <option value="Gaya hidup sehat">Gaya hidup sehat</option>
+                  <option value="Nutrisi dan diet">Nutrisi dan diet</option>
+                  <option value="Olahraga dan kebugaran">Olahraga dan kebugaran</option>
                   <option class="has-text-weight-bold" disabled>--Kecantikan--</option>
-                  <option>Produk perawatan kulit</option>
-                  <option>Gaya rambut</option>
-                  <option>Tips dan trik kecantikan</option>
+                  <option value="Produk perawatan kulit">Produk perawatan kulit</option>
+                  <option value="Gaya rambut">Gaya rambut</option>
+                  <option value="Tips dan trik kecantikan">Tips dan trik kecantikan</option>
                   <option class="has-text-weight-bold" disabled>--Lainnya--</option>
-                  <option>Lainnya</option>
+                  <option value="Lainnya">Lainnya</option>
                 </select>
               </div>
             </div>
@@ -49,7 +49,7 @@
             <div class="file has-name">
               <label class="file-label" style="width: 100%">
                 <input
-                  id="input-pic"
+                  id="input_pic"
                   class="file-input"
                   type="file"
                   name="resume"
@@ -61,10 +61,10 @@
                   <span class="file-label">Select a file</span>
                 </span>
                 <span
-                  id="file-name"
+                  id="file_name"
                   class="file-name"
                   style="width: 100%; max-width: 100%"
-                  >test.jpg</span
+                  ></span
                 >
               </label>
             </div>
@@ -72,12 +72,47 @@
           
           <div class="field is-grouped">
             <div class="control">
-              <button class="button is-primary">Publish</button>
+              <button class="button is-primary" onclick="post()">Publish</button>
             </div>
             <div class="control">
-              <button class="button is-link is-light">Cancel</button>
+              <a class="button is-link is-light" href="/">Cancel</a>
             </div>
           </div>
     </div>
   </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function post() {
+            let title = $("#input_title").val()
+            let question = $("#input_question").val()
+            let topic = $("#select_topic").val()
+            let file = $("#input_pic")[0].files[0]
+
+            let form_data = new FormData();
+            let today = new Date().toISOString()
+            form_data.append("title_give", title);
+            form_data.append("question_give", question);
+            form_data.append("topic_give", topic);
+            form_data.append("file_give", file);
+            form_data.append("date_give", today);
+            console.log(form_data);
+            $.ajax({
+                type: "POST",
+                url: "/posting",
+                data:form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] === "success") {
+                        alert(response["msg"]);
+                        window.location.replace('/')
+                      }
+                    
+                }
+            })
+        }
+    </script>
 {% endblock %}

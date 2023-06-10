@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 from pymongo import MongoClient
+from bson import ObjectId
 import jwt
 from datetime import datetime, timedelta
 import hashlib
@@ -15,7 +16,7 @@ SECRET_KEY = 'TimProjek2'
 MONGODB_CONNECTION_STRING = 'mongodb+srv://user1:123@cluster0.g1iutgc.mongodb.net/?retryWrites=true&w=majority'
 client = MongoClient(MONGODB_CONNECTION_STRING)
 db = client.finalprojectForumHnB
-TOKEN_KEY = 'mytoken'
+TOKEN_KEY = 'my_token'
 
 @app.route('/')
 def index():
@@ -27,8 +28,14 @@ def index():
                 SECRET_KEY,
                 algorithms=['HS256']
             )
-            user_info = db.users.find_one({'username':payload.get('id')})
-            return render_template('forum_after.html', user_info=user_info)
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                return render_template('forum_after.html',user_info=user_info)
+            elif user_info2:
+                return render_template('forum_after.html',user_info=user_info2)
+            
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
             return redirect(url_for('login', msg=msg))
@@ -48,8 +55,14 @@ def create_post():
                 SECRET_KEY,
                 algorithms=['HS256']
             )
-            user_info = db.users.find_one({'username':payload.get('id')})
-            return render_template('create_post.html', user_info=user_info)
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                return render_template('create_post.html',user_info=user_info)
+            elif user_info2:
+                return render_template('create_post.html',user_info=user_info2)
+            
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
             return redirect(url_for('login', msg=msg))
@@ -69,8 +82,14 @@ def register():
                 SECRET_KEY,
                 algorithms=['HS256']
             )
-            user_info = db.users.find_one({'username':payload.get('id')})
-            return redirect(url_for('index',user_info=user_info))
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                return render_template('forum_after.html',user_info=user_info)
+            elif user_info2:
+                return render_template('forum_after.html',user_info=user_info2)
+            
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
             return redirect(url_for('login', msg=msg))
@@ -91,8 +110,13 @@ def login():
                 SECRET_KEY,
                 algorithms=['HS256']
             )
-            user_info = db.users.find_one({'username':payload.get('id')})
-            return redirect(url_for('index',user_info=user_info))
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                return render_template('forum_after.html',user_info=user_info)
+            elif user_info2:
+                return render_template('forum_after.html',user_info=user_info2)
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
             return redirect(url_for('login', msg=msg))
@@ -205,6 +229,76 @@ def sign_in():
                 "msg": "We could not find a user with that id/password combination",
             }
         )
+        
+@app.route("/posting", methods=["POST"])
+def posting():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+         
+        title_receive = request.form["title_give"]
+        question_receive = request.form["question_give"]
+        topic_receive = request.form["topic_give"]
+        date_receive = request.form["date_give"]
+        
+        if user_info:
+            doc = {
+                "id_user": str(user_info["_id"]),
+                "title": title_receive,
+                "question": question_receive,
+                "topic": topic_receive,
+                "date": date_receive
+            }
+            
+            if "file_give" in request.files:
+                file = request.files["file_give"]
+                filename = secure_filename(file.filename)
+                extension = filename.split(".")[-1]
+                file_path = f"post_pics/{username}_{date}.{extension}"
+                file.save("./static/" + file_path)
+                doc["post_pic"] = filename
+                doc["post_pic_real"] = file_path
+            db.posts.insert_one(doc)
+            return jsonify({
+                "result": "success",
+                "msg": "Posting successful!"
+                })
+            
+        elif user_info2:
+            doc = {
+                "id_user": str(user_info2["_id"]),
+                "title": title_receive,
+                "question": question_receive,
+                "topic": topic_receive,
+                "date": date_receive
+            }
+            
+            if "file_give" in request.files:
+                file = request.files["file_give"]
+                filename = secure_filename(file.filename)
+                extension = filename.split(".")[-1]
+                file_path = f"post_pics/{username}_{date}.{extension}"
+                file.save("./static/" + file_path)
+                doc["post_pic"] = filename
+                doc["post_pic_real"] = file_path
+                
+            db.posts.insert_one(doc)
+            return jsonify({
+                "result": "success",
+                "msg": "Posting successful!"
+                })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000, debug=True)

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=PT+Sans&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <link
       rel="stylesheet"
@@ -26,22 +27,76 @@
       .sidebar {
         margin-top: 58px;
         position: fixed;
+        padding-bottom: 20%;
         top: 0;
         left: 0;
-        height: 100%;
-        width: 250px;
-        background-color: #f8f9fa;
-        padding: 20px;
+        bottom: 0;
+        width: 300px;
+        overflow-y: scroll;
+      }
+
+      .sidebar2 {
+        margin-top: 58px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: fit-content;
+ 
+        margin-right: 25px;
+        width: 200px;
         overflow-y: auto;
+      }
+
+      hr.separator{
+        border: 1px solid black;
+        margin: 10%;
+      }
+
+      hr.separator2{
+        border: 1px solid black;
+        margin-top: 5%;
+        margin-bottom: 5%;
+     
       }
       /* Styling for content area */
       .content {
         margin-top: 58px;
-        margin-left: 250px;
+        margin-left: 300px;
+        margin-right: 250px;
         padding: 20px;
       }
       .full-screen {
         margin-left: 0 !important;
+      }
+
+      .buttonsidebar1{
+        text-align: center;
+        border: none;
+        color: rgb(45, 45, 45);
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        padding: 2%;
+      }
+
+      .buttonsidebar1:hover {
+        background-color: rgba(18, 195, 148, 0.101);
+        color:  rgb(45, 45, 45);
+      }
+
+      .buttonsidebar2{
+        text-align: left;
+        border: none;
+        color: rgb(45, 45, 45);
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        padding: 2%;
+      }
+
+      .buttonsidebar2:hover {
+        background-color: rgba(137, 137, 137, 0.192);
+        color: rgb(45, 45, 45);
       }
     </style>
     <!-- Block untuk Title -->
@@ -49,9 +104,9 @@
         
     {% endblock %}
 </head>
-<body>
+<body style="background-color: rgb(241, 245, 249);">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary is-fixed-top">
+    <nav class="navbar navbar-expand-lg is-fixed-top shadow-sm" style="background-color: white;">
         <div class="container-fluid">
           <a class="navbar-text has-text-weight-bold" href="/">
             Forum H&B</a>
@@ -71,8 +126,8 @@
             <div class="navbar-nav">
              
 
-              <a href="#" class="btn btn-outline-primary me-2">
-                <span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+              <a href="#" class="button is-primary is-outlined me-2" style="border: none;">
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
                   <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
                 </svg></span>
                 <span>3</span>
@@ -89,24 +144,74 @@
       
    <!-- Sidebar -->
    <div id="sidebar" class="sidebar">
-    <h4>Sidebar Content</h4>
     <ul>
-      <a class="btn btn-primary me-2" href="/create_post">Start Discussion</a>
-      <li>Menu Item 1</li>
-      <li>Menu Item 2</li>
-      <li>Menu Item 3</li>
+      <div class="px-5 pt-5">
+        <div class="field has-addons">
+          <div class="control">
+            <input class="input" type="text" placeholder="Search by keyword">
+          </div>
+          <div class="control">
+            <a class="button is-primary">
+              <span class="bi bi-search"></span>
+            </a>
+          </div>
+        </div>
+        
+      </div>
+      <hr class="separator">
+      <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Menu</p>
+      <li class="d-flex flex-row">
+        <span style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
+        <button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(19, 229, 187, 0.204); border: none;"><span class="ps-3">Discussions</span></button></li>
+      <div>
+        
+        <a class="buttonsidebar1" href="/create_post"><span class="bi bi-plus-square pe-3"></span>Start Discussion
+        </a>
+      </div>
+      
+      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Topics</span></button></li>
+      <div>
+        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Nutrisi dan Diet</span></a>
+        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Pencegahan penyakit</span></a>
+        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Olahraga dan kebugaran</span></a>
+        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Perawatan kulit alami</span></a>
+        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Perawatan wajah</span></a>
+        <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/create_post"><span>See More</span></a>
+      </div>
+      <hr class="separator">
+      <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Your Activity</p>
+      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Question</span></button></li>
+      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Answer</span></button></li>
     </ul>
   </div>
 
   <!-- Content area -->
   <div class="content">
-    <h1>Content Area</h1>
-    <p>This is the main content area.</p>
-  </div>
-  
     {% block body %}
         
     {% endblock %}
+  </div>
+  
+  <div id="sidebar" class="sidebar2 pt-5">
+    <ul>
+
+      <p class="h6 has-text-weight-bold text-body-tertiary">Popular Post</p>
+      <hr class="separator2">
+    
+        <li>Post 1</li>
+        <li>Post 2</li>
+      
+      
+      <br>
+      <p class="h6 has-text-weight-bold text-body-tertiary">Must Read</p>
+      <hr class="separator2">
+     
+        <li>Post 1</li>
+        <li>Post 2</li>
+     
+    </ul>
+  </div>
+  
 
 
 

@@ -1,9 +1,83 @@
 {% extends 'base_after.html' %}
 {% block head %}
-    <title>Start Discussion</title>
+    <title>New Discussion</title>
 {% endblock %}
 {% block title %}
-    <p class="has-text-weight-bold">Start Discussion</p>
+    <p class="has-text-weight-bold">New Discussion</p>
 {% endblock %}
 {% block body %}
+<div class="card w-100">
+    <div class="card-body">
+        <p class="h3 d-flex justify-content-center">Create Post</p>
+        <div class="field">
+            
+            <label class="label">Title</label>
+            <div class="control">
+              <input class="input" type="text" placeholder="Title">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Message</label>
+            <div class="control">
+              <textarea class="textarea" placeholder="Textarea"></textarea>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Topic</label>
+            <div class="control">
+              <div class="select">
+                <select>
+                  <option class="has-text-weight-bold" disabled>--Kesehatan--</option>
+                  <option>Gaya hidup sehat</option>
+                  <option>Nutrisi dan diet</option>
+                  <option>Olahraga dan kebugaran</option>
+                  <option class="has-text-weight-bold" disabled>--Kecantikan--</option>
+                  <option>Produk perawatan kulit</option>
+                  <option>Gaya rambut</option>
+                  <option>Tips dan trik kecantikan</option>
+                  <option class="has-text-weight-bold" disabled>--Lainnya--</option>
+                  <option>Lainnya</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field control is-expanded">
+            <label class="label">Add image</label>
+            <div class="file has-name">
+              <label class="file-label" style="width: 100%">
+                <input
+                  id="input-pic"
+                  class="file-input"
+                  type="file"
+                  name="resume"
+                />
+                <span class="file-cta"
+                  ><span class="file-icon"
+                    ><i class="fa fa-upload"></i
+                  ></span>
+                  <span class="file-label">Select a file</span>
+                </span>
+                <span
+                  id="file-name"
+                  class="file-name"
+                  style="width: 100%; max-width: 100%"
+                  >test.jpg</span
+                >
+              </label>
+            </div>
+          </div>
+          
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-primary">Publish</button>
+            </div>
+            <div class="control">
+              <button class="button is-link is-light">Cancel</button>
+            </div>
+          </div>
+    </div>
+  </div>
 {% endblock %}

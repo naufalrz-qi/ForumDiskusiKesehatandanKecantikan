@@ -10,10 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=PT+Sans&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 
     <link
     href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -57,9 +54,29 @@
                 <span>3</span>
               </a> 
 
-              <a class="image rounded-circle" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
+           
+              <a class="image rounded-circle" onclick="dropdown_menu()" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
                 <img class="is-rounded" src="../static/profile_pics/profile_placeholder.png">
               </a>
+              
+              <div class="dropdown is-right" id="profile_drop">
+                <div class="dropdown-menu">
+                  <div class="dropdown-content">
+                    <a href="#" class="dropdown-item">
+                      Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      Edit Profile
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a onclick="sign_out()" class="dropdown-item">
+                      Logout
+                    </a>
+                  </div>
+                </div>
+              </div>
+      
+             
             </div>
           </div>
         </div>
@@ -86,21 +103,21 @@
       <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Menu</p>
       <li class="d-flex flex-row">
         <span style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
-        <button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(19, 229, 187, 0.204); border: none;"><span class="ps-3">Discussions</span></button></li>
+        <a href="/" class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(19, 229, 187, 0.204); border: none;"><span class="ps-3">Discussions</span></a></li>
       <div>
         
         <a class="buttonsidebar1" href="/create_post"><span class="bi bi-plus-square pe-3"></span>Start Discussion
         </a>
       </div>
       
-      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Topics</span></button></li>
+      <li><a href="/topics" class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Topics</span></a></li>
       <div>
-        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Nutrisi dan Diet</span></a>
-        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Pencegahan penyakit</span></a>
-        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Olahraga dan kebugaran</span></a>
-        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Perawatan kulit alami</span></a>
-        <a class="buttonsidebar2 ps-5" href="/create_post"><span>Perawatan wajah</span></a>
-        <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/create_post"><span>See More</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topics"><span>Nutrisi dan Diet</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topics"><span>Pencegahan penyakit</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topics"><span>Olahraga dan kebugaran</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topics"><span>Perawatan kulit alami</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topics"><span>Perawatan wajah</span></a>
+        <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/topics"><span>See More</span></a>
       </div>
       <hr class="separator">
       <div style="margin-bottom: 30%;">
@@ -164,14 +181,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <script>
-    function toggle_sidebar(){
-  
-      $('#sidebar').toggleClass('is-hidden-mobile'); // Menambahkan atau menghapus kelas is-hidden-mobile
-      $('.content').toggleClass('is-hidden-mobile')
-       
-    
-         
-    }
+        function toggle_sidebar(){
+      
+          $('#sidebar').toggleClass('is-hidden-mobile'); // Menambahkan atau menghapus kelas is-hidden-mobile
+          $('.content').toggleClass('is-hidden-mobile')
+          
+        }
+
+        function dropdown_menu(){
+          $('#profile_drop').toggleClass('is-active')
+        }
+
+        function sign_out(){
+          $.removeCookie('mytoken', {path : '/'});
+          alert('Signed out');
+          window.location.href = '/login'; 
+        }
+
       </script>
     <!-- Block untuk script JS -->
     {% block script %}

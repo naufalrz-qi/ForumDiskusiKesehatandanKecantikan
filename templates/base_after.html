@@ -86,9 +86,9 @@
    <!-- Sidebar -->
    <div id="sidebar" class="sidebar is-hidden-mobile sidebar-mobile">
     <ul>
-      <div class="px-5 pt-5">
-        <div class="field has-addons">
-          <div class="control">
+      <div class="px-5 pt-5 w-100">
+        <div class="field has-addons w-100">
+          <div class="control w-100">
             <input class="input" type="text" placeholder="Search by keyword">
           </div>
           <div class="control">
@@ -99,7 +99,7 @@
         </div>
         
       </div>
-      <hr class="separator">
+      <hr class="separator" style="margin-top: 20px; margin-bottom: 20px;">
       <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Menu</p>
       <li class="d-flex flex-row">
         <span style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
@@ -119,7 +119,7 @@
         <a class="buttonsidebar2 ps-5" href="/topics"><span>Perawatan wajah</span></a>
         <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/topics"><span>See More</span></a>
       </div>
-      <hr class="separator">
+      <hr class="separator" style="margin-top: 20px; margin-bottom: 20px;">
       <div style="margin-bottom: 30%;">
         <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Your Activity</p>
         <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Question</span></button></li>
@@ -129,11 +129,11 @@
       
       <div id="profile2" class="d-flex flex-row px-4 py-2 shadow-lg is-hidden-desktop" style="margin-top: 40%; background-color: rgb(255, 255, 255);">
        
-        <a class="image rounded-circle me-2" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
+        <a class="image rounded-circle me-2" onclick="toggle_dropmenu()" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
           <img class="is-rounded" src="../static/profile_pics/profile_placeholder.png">
-          
         </a>
 
+       
         <a href="#" class="button is-outlined me-2 is-paddingless" style="border: none;">
           <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
             <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
@@ -142,6 +142,13 @@
         </a> 
 
       </div>
+      <div id="dropmenu_mobile" class="is-hidden-desktop is-hidden-mobile">
+        <a class="buttonsidebar2 ps-5" href="/profile"><span>Profile</span></a>
+        <a class="buttonsidebar2 ps-5" href="/edit_profile"><span>Edit Profile</span></a>
+        <hr class="separator" style="margin: 0%;">
+        <a class="buttonsidebar2 ps-5" onclick="sign_out()"><span>Logout</span></a>
+      </div>
+
     </ul>
   </div>
 
@@ -190,6 +197,10 @@
 
         function dropdown_menu(){
           $('#profile_drop').toggleClass('is-active')
+        }
+
+        function toggle_dropmenu(){
+          $('#dropmenu_mobile').toggleClass('is-hidden-mobile')
         }
 
         function sign_out(){

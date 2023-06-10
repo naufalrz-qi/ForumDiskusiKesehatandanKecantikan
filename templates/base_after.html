@@ -27,12 +27,23 @@
       .sidebar {
         margin-top: 58px;
         position: fixed;
-        padding-bottom: 20%;
         top: 0;
         left: 0;
         bottom: 0;
         width: 300px;
         overflow-y: scroll;
+      }
+
+      @media screen and (max-width: 780px){
+        .sidebar-mobile {
+          margin-top: 58px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          overflow-y: scroll;
+        }
       }
 
       .sidebar2 {
@@ -65,9 +76,14 @@
         margin-right: 250px;
         padding: 20px;
       }
-      .full-screen {
-        margin-left: 0 !important;
+
+      @media screen and (max-width: 780px){
+        .full-screen {
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
       }
+      
 
       .buttonsidebar1{
         text-align: center;
@@ -143,7 +159,7 @@
     <!-- Block untuk body -->
       
    <!-- Sidebar -->
-   <div id="sidebar" class="sidebar">
+   <div id="sidebar" class="sidebar is-hidden-mobile sidebar-mobile">
     <ul>
       <div class="px-5 pt-5">
         <div class="field has-addons">
@@ -179,20 +195,39 @@
         <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/create_post"><span>See More</span></a>
       </div>
       <hr class="separator">
-      <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Your Activity</p>
-      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Question</span></button></li>
-      <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Answer</span></button></li>
+      <div style="margin-bottom: 30%;">
+        <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Your Activity</p>
+        <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Question</span></button></li>
+        <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Answer</span></button></li>
+
+      </div>
+      
+      <div id="profile2" class="d-flex flex-row px-4 py-2 shadow-lg is-hidden-desktop" style="margin-top: 40%; background-color: rgb(255, 255, 255);">
+       
+        <a class="image rounded-circle me-2" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
+          <img class="is-rounded" src="../static/profile_pics/profile_placeholder.png">
+          
+        </a>
+
+        <a href="#" class="button is-outlined me-2 is-paddingless" style="border: none;">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+          </svg></span>
+          <span>3</span>
+        </a> 
+
+      </div>
     </ul>
   </div>
 
   <!-- Content area -->
-  <div class="content">
+  <div class="content full-screen">
     {% block body %}
         
     {% endblock %}
   </div>
   
-  <div id="sidebar" class="sidebar2 pt-5">
+  <div id="sidebar" class="sidebar2 pt-5 is-hidden-mobile">
     <ul>
 
       <p class="h6 has-text-weight-bold text-body-tertiary">Popular Post</p>
@@ -224,7 +259,9 @@
     function toggle_sidebar(){
   
       $('#sidebar').toggleClass('is-hidden-mobile'); // Menambahkan atau menghapus kelas is-hidden-mobile
-      $('.content').toggleClass('full-screen'); // Menambahkan atau menghapus kelas is-hidden-mobile
+      $('.content').toggleClass('is-hidden-mobile')
+       
+    
          
     }
       </script>

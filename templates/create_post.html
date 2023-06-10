@@ -83,36 +83,5 @@
 {% endblock %}
 
 {% block script %}
-    <script>
-        function post() {
-            let title = $("#input_title").val()
-            let question = $("#input_question").val()
-            let topic = $("#select_topic").val()
-            let file = $("#input_pic")[0].files[0]
-
-            let form_data = new FormData();
-            let today = new Date().toISOString()
-            form_data.append("title_give", title);
-            form_data.append("question_give", question);
-            form_data.append("topic_give", topic);
-            form_data.append("file_give", file);
-            form_data.append("date_give", today);
-            console.log(form_data);
-            $.ajax({
-                type: "POST",
-                url: "/posting",
-                data:form_data,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    if (response["result"] === "success") {
-                        alert(response["msg"]);
-                        window.location.replace('/')
-                      }
-                    
-                }
-            })
-        }
-    </script>
+    <script src="../static/js/forum.js"></script>
 {% endblock %}

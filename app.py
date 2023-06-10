@@ -300,6 +300,66 @@ def posting():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
 
+@app.route("/get_posts", methods=["GET"])
+def get_posts():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        username_receive = request.args.get('username_give')
+        list_posts = []
+        if username_receive == '':
+            posts = list(db.posts.find({}).sort("date", -1).limit(20))
+        else:
+            posts = list(db.posts.find({'username':username_receive}).sort("date", -1).limit(20))
+    
+        for post in posts:
+            user1 = db.normal_users.find_one({'_id':ObjectId(post['id_user'])})
+            user2 = db.expert_users.find_one({'_id':ObjectId(post['id_user'])})
+            
+            if user1:
+                doc = {
+                    '_id':str(post['_id']),
+                    'username':user1['username'],
+                    'profile_name':user1['profile_name'],
+                    'profile_pic_real':user1['profile_pic_real'],
+                    'role':user1['role'],
+                    'title':post['title'],
+                    'question':post['question'],
+                    'topic':post['topic'],
+                    'date':post['date'],
+                    'post_pic_real':post['post_pic_real'],
+                    'post_pic':post['post_pic']
+                }
+                
+            if user2:
+                doc = {
+                    '_id':str(post['_id']),
+                    'username':user2['username'],
+                    'profile_name':user2['profile_name'],
+                    'profile_pic_real':user2['profile_pic_real'],
+                    'role':user2['role'],
+                    'title':post['title'],
+                    'question':post['question'],
+                    'topic':post['topic'],
+                    'date':post['date'],
+                    'post_pic_real':post['post_pic_real'],
+                    'post_pic':post['post_pic']
+                }
+            list_posts.append(doc)
+        
+        print(list_posts)
+        return jsonify({
+            "result": "success",
+            "msg": "Successful fetched all posts",
+            'posts':list_posts
+            })
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000, debug=True)
  

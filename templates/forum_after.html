@@ -6,7 +6,7 @@
     <p class="has-text-weight-bold">Forum</p>
 {% endblock %}
 {% block body %}
-<div class="card w-100 p-5" style="border-radius: 3%;">
+<div class="card w-100 p-5 my-3" style="border-radius: 3%;">
     <div class="card-body">
         <p>Title</p>
         <p>Question</p>
@@ -17,4 +17,15 @@
         
     </div>
   </div>
+  
+{% endblock %}
+
+{% block script %}
+    <script src="../static/js/forum.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".content").empty()
+            get_posts()
+        });
+    </script>
 {% endblock %}

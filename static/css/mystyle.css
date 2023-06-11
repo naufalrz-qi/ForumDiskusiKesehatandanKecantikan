@@ -1,5 +1,6 @@
 *{
     font-family: 'PT Sans', sans-serif;
+    font-size: 14px;
 }
 body {
     min-height: 100vh;
@@ -38,6 +39,7 @@ body {
 
 .help {
     color: gray;
+    font-size: 11px;
 }
 
 .modal-content {

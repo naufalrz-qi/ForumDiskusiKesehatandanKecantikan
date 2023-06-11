@@ -55,7 +55,7 @@ function post() {
             let post = posts[i];
             let html_temp2 = `
     
-            <li><a href="/${post['_id']}" class="h6 has-text-link">${post['title']}</a></li>
+            <li><a href="/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
 
 
             
@@ -98,7 +98,7 @@ function get_posts(username) {
                     <div class="card-body">
                         <div class="d-flex flex-row mb-4">
                             <a class="image is-48x48" href="/user/${post["username"]}">
-                                <img class="is-rounded" src="/static/${post["profile_pic_real"]}"
+                                <img class="is-rounded" src="../static/${post["profile_pic_real"]}"
                                     alt="Image">
                             </a>
                             <div class="d-flex flex-column mx-2">

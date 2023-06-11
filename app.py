@@ -127,6 +127,46 @@ def login():
         return render_template('login.html',msg=msg)
 
 
+@app.route('/user/<username>', methods=['GET'])
+def user(username):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=['HS256']
+        )
+        status = username == payload.get('id')
+        user_info= db.normal_users.find_one(
+            {'username':username},
+            {'_id':False}
+        )
+        user_info2= db.expert_users.find_one(
+            {'username':username},
+            {'_id':False}
+        )
+        
+        if user_info:
+            return render_template(
+                'normal_profile.html',
+                user_info=user_info,
+                status=status
+                )
+        elif user_info2:
+            return render_template(
+                'expert_profile.html',
+                user_info=user_info2,
+                status=status
+                )
+    except (jwt.ExpiredSignatureError,jwt.exceptions.DecodeError):
+        return redirect(url_for('index'))
+
+
+
+
+
+
+
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
     username_receive = request.form["username_give"]

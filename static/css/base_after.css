@@ -1,11 +1,14 @@
  /* Styling for sidebar */
+ *{
+  font-size: 14px;
+ }
  .sidebar {
     margin-top: 58px;
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 300px;
+    width: 250px;
     overflow-y: scroll;
   }
 
@@ -30,7 +33,8 @@
 
     margin-right: 25px;
     width: 200px;
-    overflow-y: auto;
+    overflow-x: hidden;
+    
   }
 
   hr.separator{
@@ -47,7 +51,7 @@
   /* Styling for content area */
   .content {
     margin-top: 58px;
-    margin-left: 300px;
+    margin-left: 250px;
     margin-right: 250px;
     padding: 20px;
   }

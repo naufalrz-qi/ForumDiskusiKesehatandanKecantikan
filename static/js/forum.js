@@ -29,13 +29,50 @@ function post() {
     })
 }
 
+  function get_posts2() {
+    
+    username = '';
+  
+    $.ajax({
+      type: "GET",
+      url: `/get_posts?username_give=${username}`,
+      data: {},
+      success: function (response) {
+        if (response["result"] === "success") {
+          let posts = response["posts"];
+          for (let i = 0; i < 3; i++) {
+            let post = posts[i];
+            let html_temp = `
+    
+            <li><a href="/${post['_id']}" class="h6 has-text-link">${post['title']}</a></li>
+
+
+            
+            `;
+            $("#must-read").append(html_temp);    
+          }
+          for (let i = 4; i < 6; i++) {
+            let post = posts[i];
+            let html_temp2 = `
+    
+            <li><a href="/${post['_id']}" class="h6 has-text-link">${post['title']}</a></li>
+
+
+            
+            `;
+            $("#popular-posts").append(html_temp2); 
+          }
+        }
+      },
+    });
+  }
 
 function get_posts(username) {
 
     if (username === undefined){
         username = '';
     }
-    $("#post-box").empty();
+
     $.ajax({
       type: "GET",
       url: `/get_posts?username_give=${username}`,

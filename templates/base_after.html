@@ -162,19 +162,25 @@
   <div id="sidebar" class="sidebar2 pt-5 is-hidden-mobile">
     <ul>
 
-      <p class="h6 has-text-weight-bold text-body-tertiary">Popular Post</p>
-      <hr class="separator2">
-    
+        <p class="h6 has-text-weight-bold text-body-tertiary">Popular Post</p>
+        <hr class="separator2">
+
+      <div id="popular-posts">
+      
         <li>Post 1</li>
         <li>Post 2</li>
+      </div>
       
       
       <br>
-      <p class="h6 has-text-weight-bold text-body-tertiary">Must Read</p>
-      <hr class="separator2">
-     
-        <li>Post 1</li>
-        <li>Post 2</li>
+      
+        <p class="h6 has-text-weight-bold text-body-tertiary">Must Read</p>
+        <hr class="separator2">
+      <div id="must-read">
+          <li>Post 1</li>
+          <li>Post 2</li>
+      </div>
+      
      
     </ul>
   </div>
@@ -212,7 +218,7 @@
       </script>
     <!-- Block untuk script JS -->
     {% block script %}
-
+      
     {% endblock %}
 </body>
 </html>

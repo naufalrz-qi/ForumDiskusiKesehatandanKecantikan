@@ -267,6 +267,11 @@ def posting():
                 file.save("./static/" + file_path)
                 doc["post_pic"] = filename
                 doc["post_pic_real"] = file_path
+            else:
+                doc["post_pic"] = 'post1.jpg'
+                doc["post_pic_real"] = 'post_pics/post1.jpg'    
+                
+                
             db.posts.insert_one(doc)
             return jsonify({
                 "result": "success",
@@ -290,6 +295,9 @@ def posting():
                 file.save("./static/" + file_path)
                 doc["post_pic"] = filename
                 doc["post_pic_real"] = file_path
+            else:
+                doc["post_pic"] = 'post1.jpg'
+                doc["post_pic_real"] = 'post_pics/post1.jpg'
                 
             db.posts.insert_one(doc)
             return jsonify({
@@ -312,9 +320,9 @@ def get_posts():
         username_receive = request.args.get('username_give')
         list_posts = []
         if username_receive == '':
-            posts = list(db.posts.find({}).sort("date", -1).limit(20))
+            posts = list(db.posts.find({}).sort("date", -1).limit(10))
         else:
-            posts = list(db.posts.find({'username':username_receive}).sort("date", -1).limit(20))
+            posts = list(db.posts.find({'username':username_receive}).sort("date", -1).limit(10))
     
         for post in posts:
             user1 = db.normal_users.find_one({'_id':ObjectId(post['id_user'])})
@@ -357,6 +365,7 @@ def get_posts():
             "msg": "Successful fetched all posts",
             'posts':list_posts
             })
+        
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
 

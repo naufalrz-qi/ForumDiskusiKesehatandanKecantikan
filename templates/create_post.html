@@ -84,4 +84,12 @@
 
 {% block script %}
     <script src="../static/js/forum.js"></script>
+    <script>
+      $(document).ready(function () {
+          $("#popular-posts").empty()
+          $("#must-read").empty()
+          get_posts2()
+        
+      });
+  </script>
 {% endblock %}

@@ -45,6 +45,11 @@ def index():
     else:
         return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return render_template("about.html")
+
+
 @app.route('/create_post')
 def create_post():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -137,27 +142,54 @@ def user(username):
             algorithms=['HS256']
         )
         status = username == payload.get('id')
-        user_info= db.normal_users.find_one(
+        user_data= db.normal_users.find_one(
             {'username':username},
             {'_id':False}
         )
-        user_info2= db.expert_users.find_one(
+        user_data2= db.expert_users.find_one(
             {'username':username},
             {'_id':False}
         )
         
+        user_info= db.normal_users.find_one(
+            {'username':payload.get('id')},
+            {'_id':False}
+        )
+        user_info2= db.expert_users.find_one(
+            {'username':payload.get('id')},
+            {'_id':False}
+        )
+        
         if user_info:
-            return render_template(
-                'normal_profile.html',
-                user_info=user_info,
-                status=status
-                )
-        elif user_info2:
-            return render_template(
-                'expert_profile.html',
-                user_info=user_info2,
-                status=status
-                )
+            if user_data:
+                return render_template(
+                    'normal_profile.html',
+                    user_data=user_data,
+                    user_info=user_info,
+                    status=status
+                    )
+            elif user_data2:
+                return render_template(
+                    'expert_profile.html',
+                    user_data=user_data2,
+                    user_info=user_info,
+                    status=status
+                    )
+        if user_info2:
+            if user_data:
+                return render_template(
+                    'normal_profile.html',
+                    user_data=user_data,
+                    user_info=user_info2,
+                    status=status
+                    )
+            elif user_data2:
+                return render_template(
+                    'expert_profile.html',
+                    user_data=user_data2,
+                    user_info=user_info2,
+                    status=status
+                    )
     except (jwt.ExpiredSignatureError,jwt.exceptions.DecodeError):
         return redirect(url_for('index'))
 

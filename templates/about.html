@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block head %}
+   <style>
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+    }
+    
+    header {
+        background: #fff;
+        height: 50px;
+        width: 100vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        left: 10px;
+        z-index: 1;
+        /* margin-top: 30px; */
+        justify-content: space-between;
+    }
+    
+    .menu{
+        display: flex;
+        align-items: center;
+        /* margin-top: 30px; */
+    }
+    
+    .register button{
+        background-color: rgb(96, 96, 96);
+        color: rgb(213, 213, 213);
+        border: none;
+        transition: all 0.3s;
+    }
+    
+    .register button:hover{
+        background-color: rgb(59, 59, 59);
+        color: rgb(213, 213, 213);
+    }
+    
+    .login button{
+        background-color: rgb(214, 214, 214);
+        border: none;
+    }
+    
+    .logo{
+        display: inline-flex;
+        align-items: center;
+        padding: 10px;
+        /* margin-top: 30px; */
+    }
+    
+    .logo p{
+        padding: 10px;
+    }
+    
+    .btn button{
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+    
+    .btngroup{
+        margin-left: 10px;
+        margin-right: 20px;
+    }
+    
+    span.btn{
+        margin: 0;
+    }
+    
+    header span {
+        margin: 20px;
+        padding: 5px;
+        font-size: 1rem;
+        color: var(--header);
+        font-weight: 300;
+        text-decoration: none;
+    }
+    
+    header span a {
+        text-decoration: none;
+        color: var(--header);
+    }
+    
+    header span a:visited {
+        text-decoration: none;
+    }
+    
+    header span a:hover {
+        border-bottom: 3px solid var(--header);
+    }
+    section{
+        background-color: rgb(146, 146, 146);
+        width: 100%;
+        height: 100%;
+    }
+    .container {
+        height: 100%;
+        margin-left: 40px;
+    }
+    
+    .first{
+        /* margin-top: vh; */
+        padding-top: 5vh;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .first h1{
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    
+    .first p{
+        font-size: 1.5em;
+    }
+    
+    .first img{
+        height: 100%;
+        margin-left: 30%;
+    }
+    
+    .sec{
+        width: 100%;
+        display: grid;
+        grid-template-columns: 0.5fr 3fr;
+        margin-top: 5%;
+        align-items: center;
+    }
+    
+    .sec img{
+        width: 200px;
+        height: 200px;
+        margin: 0;
+    }
+    
+    .sec .content{
+        margin-left: 10px;
+    }
+    
+   </style> 
+{% endblock %}
+{% block body %}
+
+<section>
+    <div class="container">
+        <div class="first">
+            <div class="text">
+                <h1>tim beauty two</h1>
+                <p class="content"> selamat datang di website forum diskusi kesehatan dan kecantikan Kami adalah tim yang berdedikasi untuk memberikan informasi terpercaya dan inspirasi dalam dunia kesehatan dan kecantikan.
+
+                    Kami memulai perjalanan ini dengan tujuan sederhana: membantu Anda mencapai kesehatan dan kecantikan yang optimal. Sejak didirikan, kami telah tumbuh menjadi tim yang berkomitmen untuk memberikan pengetahuan terkini, tips praktis, dan panduan ahli tentang kesehatan dan kecantikan. </p>
+            </div>
+            <div class="image"><img src="https://th.bing.com/th/id/OIP.SVhvmEGGPmt37pmm4ZGIjQHaEK?w=302&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="" width="80%" height="80%"></div>
+        </div>
+        <div class="sec">
+            <div class="image"><img src="https://crocodic.com/wp-content/uploads/2018/08/Gambar-5.jpg" alt=""></div>
+            <div class="text">
+                <p class="content">kami memiliki tim yang terdiri fari 4 orang dalam mengerjakan bidang terkait,desain,coding.menjadi sumber daya utama dan menginspirasi adalah tujuan kita. Terimakasih telah mengunjungi halaman about kami ~ Mari kita menjaga kesehatan dan merawat kecantikan yang luar biasa ~  </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

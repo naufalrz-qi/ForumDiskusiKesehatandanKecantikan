@@ -96,6 +96,8 @@ function get_posts(username) {
             
                 <div class="card w-100 p-5 my-3" style="border-radius: 3%;">
                     <div class="card-body">
+                    <p><a class="btn btn-success p-1 m-0" style="font-size:10px;">${post['topic']}</a></p>
+                    <p class="h4 has-text-weight-bold">${post['title']}</p>
                         <div class="d-flex flex-row mb-4">
                             <a class="image is-48x48" href="/user/${post["username"]}">
                                 <img class="is-rounded" src="../static/${post["profile_pic_real"]}"
@@ -112,10 +114,9 @@ function get_posts(username) {
                         </div>
                         
                         <div class="mt-5">
-                            <p class="h5 has-text-weight-bold">${post['title']}</p>
                             <p style="padding-bottom:5%;">${post['question']}</p>
                            
-                            <p class="mt-4">topic : <a class="btn btn-success" style="padding:5px; margin:0px;">${post['topic']}</a></p>  
+                              
                             <div class="d-flex justify-content-center">
                                 <img src="../static/${post['post_pic_real']}" alt="" style="object-fit: contain; height: 300px;">
                             </div>

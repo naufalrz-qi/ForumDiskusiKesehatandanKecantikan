@@ -1,7 +1,7 @@
 {% extends 'base_after.html' %}
 
 {% block head %}
-    <title>{{ user_info.profile_name }}'s profile</title>
+    <title>{{ user_data.profile_name }}'s profile</title>
 {% endblock %}
 {% block title %}
     <p class="has-text-weight-bold">Profile</p>
@@ -13,13 +13,13 @@
         <div class="d-flex flex-row">
             
             <figure class="image is-96x96">
-                <img class="is-rounded" src="../static/{{ user_info.profile_pic_real }}" alt="Image">
+                <img class="is-rounded" src="../static/{{ user_data.profile_pic_real }}" alt="Image">
             </figure>
             
 
             <div class="d-flex flex-column my-5">
-                <p class="h3 has-text-weight-bold m-0"> {{ user_info.profile_name }}</p>
-                <small class="has-text-weight-light text-body-tertiary"> @{{ user_info.username }}</small>
+                <p class="h3 has-text-weight-bold m-0"> {{ user_data.profile_name }}</p>
+                <small class="has-text-weight-light text-body-tertiary"> @{{ user_data.username }}</small>
             </div>
             
         </div>
@@ -27,7 +27,7 @@
         <div class="ms-5">  
             
             <p class="mt-3">
-                {{ user_info.profile_info }}
+                {{ user_data.profile_info }}
             </p>
             
             {% if status %}
@@ -60,7 +60,7 @@
                                             id="input-name"
                                             class="input"
                                             placeholder="Your name"
-                                            value="{{ user_info.profile_name }}"
+                                            value="{{ user_data.profile_name }}"
                                         />
                                         </p>
                                     </div>
@@ -86,7 +86,7 @@
                                                 id="file-name"
                                                 class="file-name"
                                                 style="width: 100%; max-width: 100%"
-                                                >{{ user_info.profile_pic }}</span
+                                                >{{ user_data.profile_pic }}</span
                                             >
                                             </label>
                                         </div>
@@ -100,7 +100,7 @@
                                             id="textarea-info"
                                             class="textarea"
                                             placeholder="Introduce yourself"
-                                        >{{ user_info.profile_info }}</textarea
+                                        >{{ user_data.profile_info }}</textarea
                                         >
                                         </p>
                                     </div>
@@ -108,7 +108,7 @@
                                         <div class="level-left"></div>
                                         <div class="level-right">
                                         <div class="level-item">
-                                            <a class="button is-primary" onclick="update_profile('{{ user_info.role }}')"
+                                            <a class="button is-primary" onclick="update_profile('{{ user_data.role }}')"
                                             >Update</a
                                             >
                                         </div>

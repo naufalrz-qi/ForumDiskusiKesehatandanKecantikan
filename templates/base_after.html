@@ -56,7 +56,7 @@
 
            
               <a class="image rounded-circle" onclick="dropdown_menu()" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
-                <img class="is-rounded" src="../static/profile_pics/profile_placeholder.png">
+                <img class="is-rounded" src="../static/{{ user_info.profile_pic_real }}">
               </a>
               
               <div class="dropdown is-right" id="profile_drop">
@@ -65,9 +65,7 @@
                     <a href="/user/{{ user_info.username }}" class="dropdown-item">
                       Profile
                     </a>
-                    <a href="#" class="dropdown-item">
-                      Edit Profile
-                    </a>
+                    
                     <hr class="dropdown-divider">
                     <a onclick="sign_out()" class="dropdown-item">
                       Logout
@@ -130,7 +128,7 @@
       <div id="profile2" class="d-flex flex-row px-4 py-2 shadow-lg is-hidden-desktop" style="margin-top: 40%; background-color: rgb(255, 255, 255);">
        
         <a class="image rounded-circle me-2" onclick="toggle_dropmenu()" href="#" style="width: 42px;height: 42px; border-color: rgb(16, 79, 108); border-style: solid; border-width: 1px;">
-          <img class="is-rounded" src="../static/profile_pics/profile_placeholder.png">
+          <img class="is-rounded" src="../static/{{ user_info.profile_pic_real }}">
         </a>
 
        
@@ -144,7 +142,6 @@
       </div>
       <div id="dropmenu_mobile" class="is-hidden-desktop is-hidden-mobile">
         <a class="buttonsidebar2 ps-5" href="/user/{{ user_info.username }}"><span>Profile</span></a>
-        <a class="buttonsidebar2 ps-5" href="/edit_profile"><span>Edit Profile</span></a>
         <hr class="separator" style="margin: 0%;">
         <a class="buttonsidebar2 ps-5" onclick="sign_out()"><span>Logout</span></a>
       </div>

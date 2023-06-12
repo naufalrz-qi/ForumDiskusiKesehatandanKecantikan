@@ -44,7 +44,7 @@ function post() {
             let post = posts[i];
             let html_temp = `
     
-            <li><a href="/${post['_id']}" class="h6 has-text-link">${post['title']}</a></li>
+            <li><a href="/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
 
 
             
@@ -110,11 +110,11 @@ function get_posts(username) {
                                 </p>   
                             </div>
                         </div>
-                        <hr class="separator" style="margin: 0%;">
+                        
                         <div class="mt-5">
                             <p class="h5 has-text-weight-bold">${post['title']}</p>
                             <p style="padding-bottom:5%;">${post['question']}</p>
-                            <hr class="separator" style="margin:0%;">
+                           
                             <p class="mt-4">topic : <a class="btn btn-success" style="padding:5px; margin:0px;">${post['topic']}</a></p>  
                             <div class="d-flex justify-content-center">
                                 <img src="../static/${post['post_pic_real']}" alt="" style="object-fit: contain; height: 300px;">

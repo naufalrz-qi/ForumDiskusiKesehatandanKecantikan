@@ -163,7 +163,63 @@ def user(username):
 
 
 
-
+@app.route("/update_profile", methods=["POST"])
+def save_img():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        username = payload.get('id')
+        name_receive = request.form["name_give"]
+        info_receive = request.form["info_give"]
+        role = request.form['role']
+        new_doc = {
+                "profile_name": name_receive, 
+                "profile_info": info_receive
+                    }
+        if role == 'normal':
+            user_info= db.normal_users.find_one(
+                    {'username':username},
+                )
+            
+            if "file_give" in request.files:
+                file = request.files["file_give"]
+                filename = secure_filename(file.filename)
+                extension = filename.split(".")[-1]
+                file_path = f"profile_pics/{str(user_info['_id'])}.{extension}"
+                file.save("./static/" + file_path)
+                new_doc["profile_pic"] = filename
+                new_doc["profile_pic_real"] = file_path
+            db.normal_users.update_one({"username": payload["id"]}, {"$set": new_doc})
+            return jsonify({
+                "result": "success", 
+                "msg": "Your profile has been updated"
+                })
+            
+        elif role == 'expert':
+            user_info= db.expert_users.find_one(
+                    {'username':username},
+                )
+            
+            if "file_give" in request.files:
+                file = request.files["file_give"]
+                filename = secure_filename(file.filename)
+                extension = filename.split(".")[-1]
+                file_path = f"profile_pics/{str(user_info['_id'])}.{extension}"
+                file.save("./static/" + file_path)
+                new_doc["profile_pic"] = filename
+                new_doc["profile_pic_real"] = file_path
+            db.expert_users.update_one({"username": payload["id"]}, {"$set": new_doc})
+            return jsonify({
+                "result": "success", 
+                "msg": "Your profile has been updated"
+                })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
 
 
 

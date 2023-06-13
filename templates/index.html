@@ -3,9 +3,7 @@
     
 {% endblock %}
 {% block body %}
-<div class="card" 
-class="card-body">
-<section class="hero is-large" style="background-image:url(../static/page_images/home.jpg); background-position: center; background-attachment: fixed; background-size: contain;">
+<section id="home" class="hero is-large" style="background-image:url(../static/page_images/home.jpg); background-position: center; background-attachment: fixed; background-size: contain;">
   <div class="hero-body" style="background: linear-gradient(90deg, rgba(0, 0, 0, 0.856) 0%, rgba(0, 0, 0, 0.116) 100%);">
     <div class="">
       <p class="title text-white" style="font-size: 42px;">
@@ -21,5 +19,44 @@ class="card-body">
     </div>
   </div>
 </section>
- 
+
+<section id="about" class="hero is-medium" style="background-color: rgb(50, 214, 189);">
+  <div class="hero-body" style="background: linear-gradient(90deg, rgba(22, 54, 61, 0.291) 0%, rgba(213, 255, 145, 0.341) 100%);">
+    <div class="">
+      <p class="title text-white px-5" style="font-size: 42px;">
+        About
+        <br>
+        Forum Health & Beauty
+      </p>
+      <p class="subtitle w-100 text-white py-4 px-5" style="font-size: large; text-align: justify;" >
+        The health and beauty forum website is an online platform dedicated to discussing and sharing information on various aspects of health and beauty. It provides a virtual space for individuals to seek guidance, advice, and support for their health and beauty concerns. Users can engage in discussions, ask questions, and share experiences with other members. The platform also offers online consultations with healthcare professionals, eliminating the need for in-person visits. Covering topics such as skincare, nutrition, fitness, and mental well-being, the forum aims to raise awareness about the importance of health and beauty, encouraging users to adopt healthy habits and make informed decisions. Overall, it serves as a valuable resource for individuals seeking to improve their overall well-being, connect with like-minded individuals, and enhance their physical appearance. 
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<section id="contact_us" style="margin: 15%; margin-top: 5%;">
+  <p class="h3 has-text-weight-bold d-flex justify-content-center">Contact Us</p>
+  <br>
+  <div class="field">
+    <div class="control">
+      <form action="mailto:estarossa.nrz+contactfhnb@gmail.com" method="post" enctype="text/plain">
+        <label for="name">Nama:</label><br>
+        <input class="input" type="text" id="name" name="name" required><br><br>
+        
+        <label for="email">Email:</label><br>
+        <input class="input" type="email" id="email" name="email" required><br><br>
+        
+        <label for="message">Pesan:</label><br>
+        <textarea class="textarea" id="message" name="message" required></textarea><br><br>
+        
+        <input class="button is-primary" type="submit" value="Send">
+      </form>
+    </div>
+  </div>
+</section>
+
+
+
 {% endblock %}

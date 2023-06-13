@@ -235,6 +235,18 @@ def save_img():
             user_info= db.expert_users.find_one(
                     {'username':username},
                 )
+            gender = request.form["gender_give"]
+            acinfo_receive = request.form["academic_give"]
+            workplace_receive = request.form["workplace_give"]
+            service_receive = request.form["service_give"]
+            number_receive = request.form["number_give"]
+            
+            
+            new_doc["gender"] = gender
+            new_doc["academic_info"] = acinfo_receive
+            new_doc["workplace"] = workplace_receive
+            new_doc["service"] = service_receive
+            new_doc["phone_number"] = number_receive
             
             if "file_give" in request.files:
                 file = request.files["file_give"]
@@ -291,7 +303,7 @@ def sign_up():
             "profile_pic": "",                                          
             "profile_pic_real": "profile_pics/profile_placeholder.png", 
             "profile_info": ""                                          
-        }
+            }
         db.normal_users.insert_one(doc)
         return jsonify({'result': 'success'})
     else:

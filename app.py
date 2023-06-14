@@ -64,9 +64,42 @@ def create_post():
             user_info2 = db.expert_users.find_one({'username':payload.get('id')})
             
             if user_info:
-                return render_template('create_post.html',user_info=user_info)
+                if user_info['role'] == 'admin':
+                    return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
+                else:   
+                    return render_template('create_post.html',user_info=user_info)
             elif user_info2:
                 return render_template('create_post.html',user_info=user_info2)
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+    
+@app.route('/report_data')
+def report_data():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    return render_template('report_data.html',user_info=user_info)
+                else: 
+                    return render_template('forum_after.html',user_info=user_info)
+            elif user_info2:
+                return render_template('forum_after.html',user_info=user_info2)
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -160,36 +193,48 @@ def user(username):
             {'_id':False}
         )
         
-        if user_info:
-            if user_data:
+        if username == 'admin':
+            if user_info['role'] == 'admin':
                 return render_template(
-                    'normal_profile.html',
-                    user_data=user_data,
-                    user_info=user_info,
-                    status=status
-                    )
-            elif user_data2:
-                return render_template(
-                    'expert_profile.html',
-                    user_data=user_data2,
-                    user_info=user_info,
-                    status=status
-                    )
-        if user_info2:
-            if user_data:
-                return render_template(
-                    'normal_profile.html',
-                    user_data=user_data,
-                    user_info=user_info2,
-                    status=status
-                    )
-            elif user_data2:
-                return render_template(
-                    'expert_profile.html',
-                    user_data=user_data2,
-                    user_info=user_info2,
-                    status=status
-                    )
+                        'normal_profile.html',
+                        user_data=user_data,
+                        user_info=user_info,
+                        status=status
+                        )
+            else:
+                return redirect(url_for('index'))
+        else:
+            if user_info:
+                if user_data:
+                    return render_template(
+                        'normal_profile.html',
+                        user_data=user_data,
+                        user_info=user_info,
+                        status=status
+                        )
+                elif user_data2:
+                    return render_template(
+                        'expert_profile.html',
+                        user_data=user_data2,
+                        user_info=user_info,
+                        status=status
+                        )
+                    
+            elif user_info2:
+                if user_data:
+                    return render_template(
+                        'normal_profile.html',
+                        user_data=user_data,
+                        user_info=user_info2,
+                        status=status
+                        )
+                elif user_data2:
+                    return render_template(
+                        'expert_profile.html',
+                        user_data=user_data2,
+                        user_info=user_info2,
+                        status=status
+                        )
     except (jwt.ExpiredSignatureError,jwt.exceptions.DecodeError):
         return redirect(url_for('index'))
 
@@ -261,6 +306,7 @@ def save_img():
                 "result": "success", 
                 "msg": "Your profile has been updated"
                 })
+        
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
@@ -499,7 +545,7 @@ def get_posts():
                 }
             list_posts.append(doc)
         
-        print(list_posts)
+        
         return jsonify({
             "result": "success",
             "msg": "Successful fetched all posts",

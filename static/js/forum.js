@@ -1,9 +1,14 @@
 function post() {
     let title = $("#input_title").val()
-    let question = $("#input_question").val()
+    let input_question = $("#input_question").val()
     let topic = $("#select_topic").val()
     let file = $("#input_pic")[0].files[0]
 
+    let paragraph = input_question.split("\n")
+    let question = ""
+    for(let i = 0; i<paragraph.length; i++){
+      question += paragraph[i]+"<br>";
+    }
     let form_data = new FormData();
     let today = new Date().toISOString()
     form_data.append("title_give", title);

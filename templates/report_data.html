@@ -1,0 +1,58 @@
+{% extends 'base_after.html' %}
+{% block head %}
+    <title>Report Datas</title>
+{% endblock %}
+{% block title %}
+<p class="has-text-weight-bold">Report Datas</p>
+    
+{% endblock %}
+{% block body %}
+<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead class="thead">
+      <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Author</th>
+        <th scope="col">Username</th>
+        <th scope="col">Type of Problem</th>
+        <th scope="col">Description</th>
+        <th scope="col">action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">1</th>
+        <td>Otto</td>
+        <td>@ottoman</td>
+        <td>Spam</td>
+        <td>I have seen this post for 100 times from this user, please take him down</td>
+        <td><a class="button is-danger" href="">BAN</a></td>
+      </tr>
+      <tr>
+        <th scope="row">2</th>
+        <td>Jacob</td>
+        <td>@fat</td>
+        <td>Spam</td>
+        <td>I have seen this post for 100 times from this user, please take him down</td>
+        <td><a class="button is-danger" href="">BAN</a></td>
+      </tr>
+      <tr>
+        <th scope="row">3</th>
+        <td>Larry</td>
+        <td>@twitter</td>
+        <td>Spam</td>
+        <td>I have seen this post for 100 times from this user, please take him down</td>
+        <td><a class="button is-danger" href="">BAN</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+{% endblock %}
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            $(".sidebar2").addClass('is-hidden')
+            $('.content').addClass('me-0')
+        });
+
+    </script>
+{% endblock %}

@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+
+    <link
+    rel="icon"
+    href="../static/logo/logo.svg"
+    type="image/x-icon"
+    />
+    <meta property="og:title" content="Forum Discussion - Health & Beauty" />
+    <meta property="og:description" content=" This forum focuses on health and beauty topics to assist individuals facing health and beauty issues, and to simplify access to online doctor consultations for individuals encountering work-related challenges." />
+    <meta
+        property="og:image"
+        content="{{ url_for('static', filename='/page_images/home.jpg') }}"
+    />
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,6 +43,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg is-fixed-top shadow-sm" style="background-color: white;">
         <div class="container-fluid">
+          <a href="">
+            <img src="../static/logo/logo.svg" style="width: 30px; height: 30px;" alt="">
+          </a>
           <a class="navbar-text has-text-weight-bold h5 m-0 mx-3" href="/">
             Forum H&B</a>
             <div class="navbar-text mx-5">
@@ -65,7 +82,10 @@
                     <a href="/user/{{ user_info.username }}" class="dropdown-item">
                       Profile
                     </a>
-                    
+                    {% if user_info.role == 'admin' %}
+                    <a class="dropdown-item" href="/verify_expert"><span>Verify Expert</span></a>
+                    <a class="dropdown-item" href="/report_data"><span>Report Data</span></a>
+                  {% endif %}
                     <hr class="dropdown-divider">
                     <a onclick="sign_out()" class="dropdown-item">
                       Logout
@@ -142,6 +162,11 @@
       </div>
       <div id="dropmenu_mobile" class="is-hidden-desktop is-hidden-mobile">
         <a class="buttonsidebar2 ps-5" href="/user/{{ user_info.username }}"><span>Profile</span></a>
+       
+        {% if user_info.role == 'admin' %}
+          <a class="buttonsidebar2 ps-5" href="/verify_expert"><span>Verify Expert</span></a>
+          <a class="buttonsidebar2 ps-5" href="/report_data"><span>Report Data</span></a>
+        {% endif %}
         <hr class="separator" style="margin: 0%;">
         <a class="buttonsidebar2 ps-5" onclick="sign_out()"><span>Logout</span></a>
       </div>

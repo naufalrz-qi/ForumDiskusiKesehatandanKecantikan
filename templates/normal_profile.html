@@ -30,7 +30,7 @@
                 {{ user_data.profile_info }}
             </p>
             
-            {% if status %}
+            {% if status and not user_data.role == 'admin' %}
             
 
             <nav id="btns-me" class="level is-mobile">

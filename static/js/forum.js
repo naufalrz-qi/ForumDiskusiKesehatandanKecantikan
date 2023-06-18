@@ -33,6 +33,8 @@ function post() {
         }
     })
 }
+
+
 function answer(id_post) {
     let input_answer = $("#textarea-answer").val()
     let file = $("#input_answer_pic")[0].files[0]
@@ -111,10 +113,10 @@ function answer(id_post) {
 function get_posts(username) {
 
     $("#discussion").empty();
-
+    console.log(username )
     if (username === undefined){
         username = '';
-    }
+    
 
     $.ajax({
       type: "GET",
@@ -135,6 +137,27 @@ function get_posts(username) {
       },
     });
   }
+  else{
+    $.ajax({
+      type: "GET",
+      url: `/get_posts?username_give=${username}`,
+      data: {},
+      success: function (response) {
+        if (response["result"] === "success") {
+          let posts = response["posts"];
+          for (let i = 0; i < posts.length; i++) {
+            let post = posts[i];
+            let id= post['_id']
+            let time_post = new Date(post["date"]);
+            
+            showPost(post, time_post)
+            getAnswer(id)
+          }
+        }
+      },
+    });
+  }
+  }
 
   function showPost(post, time_post) {  
     let time_before = time2str(time_post);
@@ -149,9 +172,23 @@ function get_posts(username) {
 
     let html_temp = `
     
-        <div class="card w-100 p-5 my-3" style="border-radius: 3%;">
+        <div class="card w-100 p-3 my-3" style="border-radius: 30px;">
             <div class="card-body">
-            <p><a class="btn btn-success p-1 m-0" style="font-size:10px;">${post['topic']}</a></p>
+            <div class="d-flex flex-row mb-5">
+            <div class="col-11">
+              <a class="btn btn-success p-1 m-0" href="" style="font-size:10px; width: fit-content;">${post['topic']}</a>
+            </div>
+            <a class="bi bi-three-dots-vertical col-1 d-flex justify-content-end" onclick="$('#post_drop_${post['_id']}').toggleClass('is-active')" style="font-size: 18px; color: inherit;"></a>
+            <div class="dropdown is-right" id="post_drop_${post['_id']}">
+              <div class="dropdown-menu">
+                <div class="dropdown-content">
+                  <a class="dropdown-item" href="/post_detail/${post['_id']}"><span>View Detail</span></a>
+                  <a class="dropdown-item" onclick=""><span>Report</span></a>
+                </div>
+              </div>
+            </div>
+            </div>
+
             <p class="h4 has-text-weight-bold">${post['title']}</p>
                 <div class="d-flex flex-row mb-4">
                     <a class="image is-48x48" href="/user/${post["username"]}">
@@ -180,7 +217,7 @@ function get_posts(username) {
 
             
             <hr class="separator m-0 mb-3 p-0">
-            <section id="answer">
+            <section id="answer" class="p-3">
               <p class="h6">Answer Section</p>
               <article class="media">
                   <div class="media-content my">
@@ -271,21 +308,21 @@ function get_posts(username) {
       if (response["result"] === "success") {
         let answers = response["answers"];
         console.log(response['answers'])
-        if(answers.length>0){
-        for (let i = 0; i < answers.length; i++) {
+        if(answers.length>0 & answers.length<3){
+        for (let i = 0; i < 2; i++) {
             let answer = answers[i];
             let time_answer = new Date(answer["date"]);
             let time_before2 = time2str(time_answer);
             let answer_temp =
                 `
-                <div class="w-100">
+                <div class="w-100 px-lg-3 p-sm-1">
                 <div>
                     <div class="d-flex flex-row mb-4">
-                        <a class="image is-48x48" href="/user/${answer["username"]}">
-                            <img class="is-rounded" src="../static/${answer["profile_pic_real"]}"
+                        <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
+                            <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
                                 alt="Image">
                         </a>
-                        <div class="card d-flex flex-column mx-2 p-3 w-100" >
+                        <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                             <p class="m-0 p-0">
                                 <strong>${answer["profile_name"]}</strong>                 
                             </p>
@@ -293,7 +330,7 @@ function get_posts(username) {
                             <small>@${answer["username"]}</small> <small>${time_before2}</small>      
                             </p>
                           
-                            <p style="padding-bottom:5%;">${answer['answer']}</p>
+                            <p>${answer['answer']}</p>
                           
                         </div>
                     </div>
@@ -304,21 +341,21 @@ function get_posts(username) {
 
           }
         }
-        else if(answers.length>3){
+        else if(answers.length>=3){
           for (let i = 0; i < 3; i++) {
               let answer = answers[i];
               let time_answer = new Date(answer["date"]);
               let time_before2 = time2str(time_answer);
               let answer_temp =
                   `
-                  <div class="w-100">
+                  <div class="w-100 px-lg-3 p-sm-1">
                   <div>
                       <div class="d-flex flex-row mb-4">
-                          <a class="image is-48x48" href="/user/${answer["username"]}">
-                              <img class="is-rounded" src="../static/${answer["profile_pic_real"]}"
+                          <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
+                              <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
                                   alt="Image">
                           </a>
-                          <div class="card d-flex flex-column mx-2 p-3 w-100">
+                          <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                               <p class="m-0 p-0">
                                   <strong>${answer["profile_name"]}</strong>                 
                               </p>
@@ -326,7 +363,7 @@ function get_posts(username) {
                               <small>@${answer["username"]}</small> <small>${time_before2}</small>      
                               </p>
                             
-                              <p style="padding-bottom:5%;">${answer['answer']}</p>
+                              <p>${answer['answer']}</p>
                             
                           </div>
                       </div>
@@ -343,6 +380,53 @@ function get_posts(username) {
 
   })  }
 
+  function getAnswer_detail(postID) {
+    $.ajax({
+    type:"POST",
+    url:'/get_answers',
+    data:{'id_post':postID},
+    success:function(response){
+      if (response["result"] === "success") {
+        let answers = response["answers"];
+        console.log(response['answers'])
+        if(answers.length>0){
+          for (let i = 0; i < answers.length; i++) {
+              let answer = answers[i];
+              let time_answer = new Date(answer["date"]);
+              let time_before2 = time2str(time_answer);
+              let answer_temp =
+                  `
+                  <div class="w-100 px-lg-3 p-sm-1">
+                  <div>
+                      <div class="d-flex flex-row mb-4">
+                          <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
+                              <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
+                                  alt="Image">
+                          </a>
+                          <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
+                              <p class="m-0 p-0">
+                                  <strong>${answer["profile_name"]}</strong>                 
+                              </p>
+                              <p class="m-0 p-0">
+                              <small>@${answer["username"]}</small> <small>${time_before2}</small>      
+                              </p>
+                            
+                              <p>${answer['answer']}</p>
+                            
+                          </div>
+                      </div>
+                  
+                  </div> 
+                  `
+
+            $('#answer').append(answer_temp);
+                
+            }
+          }
+      }
+    }
+
+  })  }
   function time2str(date) {
     let today = new Date();
     let time = (today - date) / 1000 / 60;  // minutes

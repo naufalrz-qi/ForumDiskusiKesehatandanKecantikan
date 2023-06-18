@@ -1,0 +1,157 @@
+{% extends 'base_after.html' %}
+{% block head %}
+    <title>Forum</title>
+{% endblock %}
+{% block title %}
+    <p class="has-text-weight-bold">Detail</p>
+{% endblock %}
+{% block body %}
+<section id="discussion">
+    <div class="card w-100 p-3 my-3" style="border-radius: 30px;">
+        <div class="card-body">
+        <div class="d-flex flex-row mb-5">
+        <div class="col-11">
+          <a class="btn btn-success p-1 m-0" href="" style="font-size:10px; width: fit-content;">{{ post.topic }}</a>
+        </div>
+        <a class="bi bi-three-dots-vertical col-1 d-flex justify-content-end" onclick="$('#post_drop').toggleClass('is-active')" style="font-size: 18px; color: inherit;"></a>
+        <div class="dropdown is-right" id="post_drop">
+          <div class="dropdown-menu">
+            <div class="dropdown-content">
+              <a class="dropdown-item" href="/edit_post/{{ post._id }}"><span>Edit Post</span></a>
+              <a class="dropdown-item" href="/delete/{{ post._id }}"><span>Delete Post</span></a>
+              <a class="dropdown-item" onclick=""><span>Report</span></a>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <p class="h4 has-text-weight-bold">{{ post.title }}</p>
+            <div class="d-flex flex-row mb-4">
+                <a class="image is-48x48" href="/user/{{ post.username }}">
+                    <img class="is-rounded" src="../static/{{ post.profile_pic_real }}"
+                        alt="Image">
+                </a>
+                <div class="d-flex flex-column mx-2">
+                    <p class="m-0 p-0">
+                        <strong>{{ post.profile_name }}</strong>                 
+                    </p>
+                    <p class="m-0 p-0">
+                    <small>{{ post.username }}</small> <small id="time_before"></small>      
+                    </p>   
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <p style="padding-bottom:5%;">{{ post.question|safe }}</p>
+                
+                  
+                <div class="d-flex justify-content-center">
+                    <img src="../static/{{ post.post_pic_real }}" alt="" style="object-fit: contain; height: 300px;">
+                </div>
+            </div>
+        </div>
+
+        
+        <hr class="separator m-0 mb-3 p-0">
+        <section id="answer" class="p-3">
+          <p class="h6">Answer Section</p>
+          <article class="media">
+              <div class="media-content my">
+                  <div class="field">
+                      <p class="control">
+                          <input 
+                          id="input-answer"
+                          class="input is-rounded"
+                          placeholder="What are you thinking about?"
+                          onclick="$('#modal-answer').addClass('is-active')"
+                          />
+
+                          <div class="modal" id="modal-answer">
+                              <div class="modal-background" onclick='$("#modal-answer").removeClass("is-active")'></div>
+                              <div class="modal-content">
+                        
+                                      <article class="media">
+                                          <div class="media-content p-5">
+                                              <div class="field">
+                                                  <p class="control">
+                                                      <textarea id="textarea-answer" class="textarea"
+                                                                placeholder="Answer the question"></textarea>
+                                                  </p>
+                                              </div>
+                                              <div class="field control is-expanded">
+                                        <label class="label">Add image</label>
+                                        <div class="file has-name py-2">
+                                          <label class="file-label" style="width: 100%">
+                                            <input
+                                              id="input_answer_pic"
+                                              class="file-input"
+                                              type="file"
+                                              name="resume"
+                                            />
+                                            <span class="file-cta"
+                                              ><span class="file-icon"
+                                                ><i class="fa fa-upload"></i
+                                              ></span>
+                                              <span class="file-label">Select a file</span>
+                                            </span>
+                                            <span
+                                              id="file_name"
+                                              class="file-name"
+                                              style="width: 100%; max-width: 100%"
+                                              ></span
+                                            >
+                                          </label>
+                                        </div>
+                                      </div>
+                                              <nav class="level is-mobile">
+                                                  <div class="level-right">
+                                                      <div class="level-item">
+                                                          <a class="button is-primary" onclick="answer('{{ post._id }}')">Answer</a>
+                                                      </div>
+                                                      <div class="level-item">
+                                                          <a class="button is-primary is-outlined"
+                                                            onclick='$("#modal-answer").removeClass("is-active")'>Cancel</a>
+                                                      </div>
+                                                  </div>
+                                              </nav>
+                                          </div>
+                                      </article>
+                                  
+                              </div>
+                              <button class="modal-close is-large" aria-label="close"
+                                      onclick='$("#modal-answer").removeClass("is-active")'></button>
+                          </div>
+
+                      </p>
+                  </div>
+              </div>
+          </article>
+          <div id="answer">
+             
+          </div>
+        </section>
+    </div>
+</section>
+  
+{% endblock %}
+
+{% block script %}
+    <script src="../static/js/forum.js"></script>
+    <script>
+        $(document).ready(function () {
+            time_before()
+            $("#popular-posts").empty()
+            $("#must-read").empty()
+            get_posts2()
+            getAnswer_detail('{{ post._id }}')
+          
+        });
+
+        function time_before(){
+            let time = new Date('{{ post.date }}')
+            let time2 = time2str(time);
+            let temp_html = `${time2}`
+            $('#time_before').append(temp_html);
+        }
+    </script>
+{% endblock %}

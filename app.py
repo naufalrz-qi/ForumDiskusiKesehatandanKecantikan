@@ -80,6 +80,36 @@ def create_post():
     else:
         return redirect(url_for('login'))
     
+@app.route('/edit_post/<id_post>')
+def edit_post(id_post):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
+                else:   
+                    return render_template('create_post.html',user_info=user_info)
+            elif user_info2:
+                return render_template('create_post.html',user_info=user_info2)
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+    
 @app.route('/report_data')
 def report_data():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -490,7 +520,7 @@ def answering():
             else:
                 doc = {
                     "id_post": id_post,
-                    "id_user": str(user_info["_id"]),
+                    "id_user": str(user_info2["_id"]),
                     "answer": answer_receive,
                     "date": date_receive
                 }
@@ -552,10 +582,10 @@ def get_answers():
             if user2:
                 doc = {
                     '_id':str(answer['_id']),
-                    'username':user1['username'],
-                    'profile_name':user1['profile_name'],
-                    'profile_pic_real':user1['profile_pic_real'],
-                    'role':user1['role'],
+                    'username':user2['username'],
+                    'profile_name':user2['profile_name'],
+                    'profile_pic_real':user2['profile_pic_real'],
+                    'role':user2['role'],
                     'answer':answer['answer'],
                     'date':answer['date'],
                     'answer_pic_real':answer['answer_pic_real'],
@@ -575,6 +605,76 @@ def get_answers():
 
     
     
+@app.route("/post_detail/<id_post>")
+def post_detail(id_post):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+            post = db.posts.find_one({'_id':ObjectId(id_post)})
+        
+            user1 = db.normal_users.find_one({'_id':ObjectId(post['id_user'])})
+            user2 = db.expert_users.find_one({'_id':ObjectId(post['id_user'])})
+            
+            doc = {}
+            if user1:
+                doc = {
+                    '_id':str(post['_id']),
+                    'username':user1['username'],
+                    'profile_name':user1['profile_name'],
+                    'profile_pic_real':user1['profile_pic_real'],
+                    'role':user1['role'],
+                    'title':post['title'],
+                    'question':post['question'],
+                    'topic':post['topic'],
+                    'date':post['date'],
+                    'post_pic_real':post['post_pic_real'],
+                    'post_pic':post['post_pic']
+                }
+                
+            if user2:
+                doc = {
+                    '_id':str(post['_id']),
+                    'username':user2['username'],
+                    'profile_name':user2['profile_name'],
+                    'profile_pic_real':user2['profile_pic_real'],
+                    'role':user2['role'],
+                    'title':post['title'],
+                    'question':post['question'],
+                    'topic':post['topic'],
+                    'date':post['date'],
+                    'post_pic_real':post['post_pic_real'],
+                    'post_pic':post['post_pic']
+                }        
+            
+            if user_info:
+                return render_template('post_detail.html',
+                                       user_info=user_info,
+                                        post=doc
+                )
+            elif user_info2:
+                return render_template('post_detail.html',
+                                       user_info=user_info2,
+                                        post=doc
+                )
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return render_template('index.html')
+
+        
 @app.route("/posting", methods=["POST"])
 def posting():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -669,7 +769,7 @@ def get_posts():
         if username_receive == '':
             posts = list(db.posts.find({}).sort("date", -1).limit(10))
         else:
-            posts = list(db.posts.find({'username':username_receive}).sort("date", -1).limit(10))
+            posts = list(db.posts.find({'id_user':username_receive}).sort("date", -1).limit(10))
     
         for post in posts:
             user1 = db.normal_users.find_one({'_id':ObjectId(post['id_user'])})

@@ -33,7 +33,33 @@
 
     <link rel="stylesheet" href="../static/css/mystyle.css">
     <link rel="stylesheet" href="../static/css/base_after.css">
+    <style>
+      .btn_active{
+        text-align: start; 
+        background-color: rgba(19, 229, 187, 0.204); 
+        border: none;
+      }
 
+      .btn_inactive{
+        text-align: start; 
+        background-color: rgba(9, 16, 58, 0.131); 
+        border: none;
+      }
+
+      .btn_active:hover{
+        text-align: start; 
+        background-color: rgba(27, 169, 141, 0.505); 
+        border: none;
+        color: white;
+      }
+
+      .btn_inactive:hover{
+        text-align: start; 
+        background-color: rgba(9, 16, 58, 0.524); 
+        border: none;
+        color: white;
+      }
+    </style>
     <!-- Block untuk Title -->
     {% block head %}
         
@@ -123,8 +149,8 @@
       <hr class="separator" style="margin-top: 20px; margin-bottom: 20px;">
       <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Menu</p>
       <li class="d-flex flex-row">
-        <span style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
-        <a href="/" class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(19, 229, 187, 0.204); border: none;"><span class="ps-3">Discussions</span></a></li>
+        <span id="span_discussions" style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
+        <a id="btn_discussions" onclick="toggle_btndiscussions()" class="btn btn_active is-radiusless w-100 px-5 has-text-weight-bold"><span class="ps-3">Discussions</span></a></li>
       <div>
         
         <a class="buttonsidebar1" href="/create_post"><span class="bi bi-plus-square pe-3"></span>Start Discussion
@@ -143,8 +169,10 @@
       <hr class="separator" style="margin-top: 20px; margin-bottom: 20px;">
       <div style="margin-bottom: 30%;">
         <p class="h6 has-text-weight-bold px-5 text-body-tertiary">Your Activity</p>
-        <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Question</span></button></li>
-        <li><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Answer</span></button></li>
+        <li class="d-flex flex-row">
+        <span id="span_urquestion" class="is-hidden" style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
+        <button id="btn_urquestion" onclick="toggle_yourquestion()" class="btn btn_inactive w-100 px-5 has-text-weight-bold is-radiusless"><span class="ps-3">Your Question</span></button></li>
+        <li class="d-flex flex-row"><button class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Your Answer</span></button></li>
 
       </div>
       
@@ -219,6 +247,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <script>
+        function toggle_yourquestion(){
+          get_posts('{{ user_info._id }}')
+          $('#span_discussions').addClass("is-hidden")
+          $('#span_urquestion').removeClass("is-hidden")
+          $('#btn_discussions').addClass("btn_inactive")
+          $('#btn_discussions').removeClass("btn_active")
+          $('#btn_urquestion').addClass("btn_active")
+          $('#btn_urquestion').removeClass("btn_inactive")
+          
+        }
+        function toggle_btndiscussions(){
+          get_posts()
+          $('#span_urquestion').addClass("is-hidden")
+          $('#span_discussions').removeClass("is-hidden")
+          $('#btn_urquestion').addClass("btn_inactive")
+          $('#btn_urquestion').removeClass("btn_active")
+          $('#btn_discussions').addClass("btn_active")
+          $('#btn_discussions').removeClass("btn_inactive")
+          
+        }
         function toggle_sidebar(){
       
           $('#sidebar').toggleClass('is-hidden-mobile'); // Menambahkan atau menghapus kelas is-hidden-mobile

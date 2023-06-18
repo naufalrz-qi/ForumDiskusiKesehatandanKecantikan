@@ -42,11 +42,6 @@ body {
     font-size: 11px;
 }
 
-.modal-content {
-    width: 600px;
-    height: 80%;
-}
-
 input::-webkit-calendar-picker-indicator {
     display: none;
 }
@@ -61,3 +56,7 @@ input::-webkit-calendar-picker-indicator {
     font-family: 'Stylish', sans-serif;
     font-size: larger;
 }
+
+.hidden-text {
+    display: none;
+  }

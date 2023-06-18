@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link
+    rel="icon"
+    href="../static/logo/logo.svg"
+    type="image/x-icon"
+    />
+    <meta property="og:title" content="Forum Discussion - Health & Beauty" />
+    <meta property="og:description" content=" This forum focuses on health and beauty topics to assist individuals facing health and beauty issues, and to simplify access to online doctor consultations for individuals encountering work-related challenges." />
+    <meta
+        property="og:image"
+        content="{{ url_for('static', filename='/page_images/home.jpg') }}"
+    />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,9 +53,9 @@
           </button>
           <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href="/#home">Home</a>
-              <a class="nav-link" href="#about">About</a>
-              <a class="nav-link me-5" href="#contact_us">Contact Us</a>
+              <a class="nav-link active" id="btn_home" onclick="btn_home()" aria-current="page" href="/#home">Home</a>
+              <a class="nav-link" id="btn_about" onclick="btn_about()" href="/#about">About</a>
+              <a class="nav-link me-5" id="btn_contact" onclick="btn_contact()" href="/#contact_us">Contact Us</a>
               <a class="button is-primary is-outlined me-2" href="/register">Register</a>
               <a class="button is-primary me-2" href="/login">Login</a>
             </div>
@@ -61,7 +72,7 @@
       <footer class="py-3 my-4">
         
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-          <li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary">Home</a></li>
+          <li class="nav-item"><a href="/#home" class="nav-link px-2 text-body-secondary">Home</a></li>
           <li class="nav-item"><a href="/about" class="nav-link px-2 text-body-secondary">About Us</a></li>
         </ul>
         <p class="text-center text-body-secondary">© 2023 Team Project 2 Group 3</p>
@@ -72,7 +83,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <!-- Block untuk script JS -->
     {% block script %}
-
+        <script>
+          function btn_home(){
+            $('#btn_home').addClass('has-text-weight-bold');
+            $('#btn_about').removeClass('has-text-weight-bold');
+            $('#btn_contact').removeClass('has-text-weight-bold');
+          }
+          function btn_about(){
+            $('#btn_home').removeClass('has-text-weight-bold');
+            $('#btn_about').addClass('has-text-weight-bold');
+            $('#btn_contact').removeClass('has-text-weight-bold');
+          }
+          function btn_contact(){
+            $('#btn_home').removeClass('has-text-weight-bold');
+            $('#btn_about').removeClass('has-text-weight-bold');
+            $('#btn_contact').addClass('has-text-weight-bold');
+          }
+        </script>
     {% endblock %}
 </body>
 </html>

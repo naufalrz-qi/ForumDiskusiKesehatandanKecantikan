@@ -141,28 +141,31 @@ def register():
 def login():
     msg = request.args.get('msg')
     token_receive = request.cookies.get(TOKEN_KEY)
-    if token_receive:
-        try:
-            payload = jwt.decode(
-                token_receive,
-                SECRET_KEY,
-                algorithms=['HS256']
-            )
-            user_info = db.normal_users.find_one({'username':payload.get('id')})
-            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
-            
-            if user_info:
-                return render_template('forum_after.html',user_info=user_info)
-            elif user_info2:
-                return render_template('forum_after.html',user_info=user_info2)
-        except jwt.ExpiredSignatureError:
-            msg='Your token has expired'
-            return redirect(url_for('login', msg=msg))
-        except jwt.exceptions.DecodeError:
-            msg='There was a problem logging you in'
-            return redirect(url_for('login', msg=msg))
-    else:
+    if msg:
         return render_template('login.html',msg=msg)
+    else:
+        if token_receive:
+            try:
+                payload = jwt.decode(
+                    token_receive,
+                    SECRET_KEY,
+                    algorithms=['HS256']
+                )
+                user_info = db.normal_users.find_one({'username':payload.get('id')})
+                user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+                
+                if user_info:
+                    return render_template('forum_after.html',user_info=user_info)
+                elif user_info2:
+                    return render_template('forum_after.html',user_info=user_info2)
+            except jwt.ExpiredSignatureError:
+                msg='Your token has expired'
+                return redirect(url_for('login', msg=msg))
+            except jwt.exceptions.DecodeError:
+                msg='There was a problem logging you in'
+                return redirect(url_for('login', msg=msg))
+        else:
+            return render_template('login.html',msg=msg)
 
 
 @app.route('/user/<username>', methods=['GET'])
@@ -194,15 +197,26 @@ def user(username):
         )
         
         if username == 'admin':
-            if user_info['role'] == 'admin':
-                return render_template(
-                        'normal_profile.html',
-                        user_data=user_data,
-                        user_info=user_info,
-                        status=status
-                        )
-            else:
-                return redirect(url_for('index'))
+            if user_info:
+                if user_info['role'] == 'admin':
+                    return render_template(
+                            'normal_profile.html',
+                            user_data=user_data,
+                            user_info=user_info,
+                            status=status
+                            )
+                else:
+                    return redirect(url_for('index'))
+            elif user_info2:
+                if user_info2['role'] == 'admin':
+                    return render_template(
+                            'normal_profile.html',
+                            user_data=user_data,
+                            user_info=user_info,
+                            status=status
+                            )
+                else:
+                    return redirect(url_for('index'))
         else:
             if user_info:
                 if user_data:
@@ -415,7 +429,152 @@ def sign_in():
                 "msg": "We could not find a user with that id/password combination",
             }
         )
+@app.route("/answering", methods=["POST"])
+def answering():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
         
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+         
+        answer_receive = request.form["answer_give"]
+        id_post = request.form["id_post"]
+        date_receive = request.form["date_give"]
+        
+        if user_info:
+            if user_info['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "id_post": id_post,
+                    "id_user": str(user_info["_id"]),
+                    "answer": answer_receive,
+                    "date": date_receive
+                }
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"answer_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["answer"] = filename
+                    doc["answer_pic_real"] = file_path 
+                else:
+                    doc["answer_pic"] = ''
+                    doc["answer_pic_real"] = ''  
+                    
+                    
+                db.answers.insert_one(doc)
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successful!"
+                    })
+            
+        elif user_info2:
+            if user_info2['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "id_post": id_post,
+                    "id_user": str(user_info["_id"]),
+                    "answer": answer_receive,
+                    "date": date_receive
+                }
+                
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"answer_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["answer_pic"] = filename
+                    doc["answer_pic_real"] = file_path
+                else:
+                    doc["answer_pic"] = ''
+                    doc["answer_pic_real"] = ''  
+                    
+                db.answers.insert_one(doc)
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successful!"
+                    })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
+    
+@app.route("/get_answers", methods=["POST"])
+def get_answers():
+    id_post_receive = request.form['id_post']
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        list_answers = []
+
+        answers = list(db.answers.find({'id_post':id_post_receive}).sort("date", -1))
+    
+        for answer in answers:
+            user1 = db.normal_users.find_one({'_id':ObjectId(answer['id_user'])})
+            user2 = db.expert_users.find_one({'_id':ObjectId(answer['id_user'])})
+            
+            if user1:
+                doc = {
+                    '_id':str(answer['_id']),
+                    'username':user1['username'],
+                    'profile_name':user1['profile_name'],
+                    'profile_pic_real':user1['profile_pic_real'],
+                    'role':user1['role'],
+                    'answer':answer['answer'],
+                    'date':answer['date'],
+                    'answer_pic_real':answer['answer_pic_real'],
+                    'answer_pic':answer['answer_pic']
+                }
+                
+            if user2:
+                doc = {
+                    '_id':str(answer['_id']),
+                    'username':user1['username'],
+                    'profile_name':user1['profile_name'],
+                    'profile_pic_real':user1['profile_pic_real'],
+                    'role':user1['role'],
+                    'answer':answer['answer'],
+                    'date':answer['date'],
+                    'answer_pic_real':answer['answer_pic_real'],
+                    'answer_pic':answer['answer_pic']
+                }
+            list_answers.append(doc)
+        
+        
+        return jsonify({
+            "result": "success",
+            "msg": "Successful fetched all answers",
+            'answers':list_answers
+            })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+
+    
+    
 @app.route("/posting", methods=["POST"])
 def posting():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -493,6 +652,8 @@ def posting():
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
+
+
 
 @app.route("/get_posts", methods=["GET"])
 def get_posts():

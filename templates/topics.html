@@ -1,0 +1,175 @@
+{% extends 'base_after.html' %}
+{% block head %}
+    <title>Topics</title>
+{% endblock %}
+{% block title %}
+<p class="has-text-weight-bold">Topics</p>
+    
+{% endblock %}
+{% block body %}
+<section class="w-100">
+    <div class="card w-100 p-5" style="border-radius: 30px;">
+        <div class="card-body">
+            <h1 class="title has-text-primary">Topics</h1>
+            
+            <div class="columns is-multiline">
+                <!-- Kesehatan Umum -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Umum</h2>
+                <ul>
+                    <li><a href="/topic/lifestyle">Gaya hidup sehat</a></li>
+                    <li><a href="/topic/nutrition">Nutrisi dan diet</a></li>
+                    <li><a href="/topic/fitness">Olahraga dan kebugaran</a></li>
+                    <li><a href="/topic/mental-health">Kesehatan mental dan kesejahteraan</a></li>
+                    <li><a href="/topic/prevention">Pencegahan penyakit</a></li>
+                    <li><a href="/topic/children-health">Kesehatan anak-anak dan remaja</a></li>
+                </ul>
+                </div>
+                
+                <!-- Perawatan Kulit -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Perawatan Kulit</h2>
+                <ul>
+                    <li><a href="/topic/facial-care">Perawatan wajah</a></li>
+                    <li><a href="/topic/skincare-products">Produk perawatan kulit</a></li>
+                    <li><a href="/topic/natural-skin-care">Perawatan kulit alami</a></li>
+                    <li><a href="/topic/skin-issues">Masalah kulit</a></li>
+                    <li><a href="/topic/sun-protection">Paparan sinar matahari dan perlindungan UV</a></li>
+                </ul>
+                </div>
+                
+                <!-- Rambut dan Perawatan Rambut -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Rambut dan Perawatan Rambut</h2>
+                <ul>
+                    <li><a href="/topic/hair-care">Perawatan rambut</a></li>
+                    <li><a href="/topic/hairstyles">Gaya rambut</a></li>
+                    <li><a href="/topic/hair-issues">Masalah rambut</a></li>
+                </ul>
+                </div>
+                
+                <!-- Make-up dan Produk Kecantikan -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Make-up dan Produk Kecantikan</h2>
+                <ul>
+                    <li><a href="/topic/makeup-application">Aplikasi make-up dan teknik</a></li>
+                    <li><a href="/topic/cosmetic-products">Produk kosmetik</a></li>
+                    <li><a href="/topic/beauty-tips">Tips dan trik kecantikan</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Mata -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Mata</h2>
+                <ul>
+                    <li><a href="/topic/eye-care">Perawatan mata</a></li>
+                    <li><a href="/topic/contact-lenses">Penggunaan lensa kontak</a></li>
+                    <li><a href="/topic/eye-issues">Masalah mata</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Gigi dan Mulut -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Gigi dan Mulut</h2>
+                <ul>
+                    <li><a href="/topic/dental-care">Perawatan gigi</a></li>
+                    <li><a href="/topic/dental-issues">Penyakit gigi dan gusi</a></li>
+                    <li><a href="/topic/oral-health">Kesehatan mulut</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Wanita -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Wanita</h2>
+                <ul>
+                    <li><a href="/topic/reproductive-health">Kesehatan reproduksi</a></li>
+                    <li><a href="/topic/feminine-care">Perawatan kewanitaan</a></li>
+                    <li><a href="/topic/pregnancy">Kehamilan dan persalinan</a></li>
+                    <li><a href="/topic/menstruation-menopause">Masalah menstruasi dan menopause</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Pria -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Pria</h2>
+                <ul>
+                    <li><a href="/topic/male-reproductive-health">Kesehatan reproduksi pria</a></li>
+                    <li><a href="/topic/male-skin-care">Perawatan kulit pria</a></li>
+                    <li><a href="/topic/male-lifestyle">Gaya hidup sehat untuk pria</a></li>
+                </ul>
+                </div>
+                
+                <!-- Suplemen dan Obat-obatan -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Suplemen dan Obat-obatan</h2>
+                <ul>
+                    <li><a href="/topic/dietary-supplements">Suplemen makanan</a></li>
+                    <li><a href="/topic/vitamins-minerals">Vitamin dan mineral</a></li>
+                    <li><a href="/topic/alternative-medicine">Pengobatan alternatif</a></li>
+                    <li><a href="/topic/common-medications">Obat-obatan umum</a></li>
+                </ul>
+                </div>
+                
+                <!-- Estetika dan Perawatan Tubuh -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Estetika dan Perawatan Tubuh</h2>
+                <ul>
+                    <li><a href="/topic/body-care">Perawatan tubuh</a></li>
+                    <li><a href="/topic/nail-care">Perawatan kuku</a></li>
+                    <li><a href="/topic/non-surgical-procedures">Prosedur kosmetik non-bedah</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Alamiah -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Alamiah</h2>
+                <ul>
+                    <li><a href="/topic/herbal-traditional-medicine">Pengobatan herbal dan tradisional</a></li>
+                    <li><a href="/topic/essential-oils">Penggunaan minyak essensial</a></li>
+                    <li><a href="/topic/alternative-therapies">Terapi alternatif</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan Mental dan Emosional -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan Mental dan Emosional</h2>
+                <ul>
+                    <li><a href="/topic/stress-management">Manajemen stres</a></li>
+                    <li><a href="/topic/mental-wellbeing">Kesehatan pikiran dan kecerdasan emosional</a></li>
+                    <li><a href="/topic/psychological-therapy">Terapi psikologis dan konseling</a></li>
+                </ul>
+                </div>
+                
+                <!-- Kesehatan dan Kecantikan dalam Masyarakat dan Budaya -->
+                <div class="column is-one-third">
+                <h2 class="subtitle">Kesehatan dan Kecantikan dalam Masyarakat dan Budaya</h2>
+                <ul>
+                    <li><a href="/topic/beauty-norms">Norma kecantikan</a></li>
+                    <li><a href="/topic/body-image">Persepsi tubuh dan citra diri</a></li>
+                    <li><a href="/topic/pop-culture-health-beauty">Kesehatan dan kecantikan dalam budaya populer</a></li>
+                </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+  
+{% endblock %}
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            $(".sidebar2").addClass('is-hidden')
+            $('.content').addClass('me-0')
+            $('#span_urquestion').addClass("is-hidden")
+            $('#span_discussions').addClass("is-hidden")
+            $('#btn_urquestion').addClass("btn_inactive")
+            $('#btn_urquestion').removeClass("btn_active")
+            $('#btn_discussions').addClass("btn_inactive")
+            $('#btn_discussions').removeClass("btn_active")
+            $('#btn_topics').addClass("btn_active")
+            $('#btn_topics').removeClass("btn_inactive")
+            $('#span_topics').removeClass("is-hidden")
+        });
+
+    </script>
+{% endblock %}

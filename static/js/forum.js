@@ -276,15 +276,15 @@ function get_posts(username) {
             
             <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <section id="answer" class="p-3">
-              <p class="h6">Answer Section</p>
-              <article class="media" style="margin-bottom:0px">
-                  <div class="media-content my">
+              <p class="h6 has-text-weight-bold"><a class="text-body-secondary" href="/post_detail/${post['_id']}" >See another answer</a></p>
+              <article class="media" style="margin-bottom:0px;">
+                  <div class="media-content">
                       <div class="field">
                           <p class="control">
                               <input 
                               id="input-answer"
                               class="input is-rounded"
-                              placeholder="What are you thinking about?"
+                              placeholder="Answer the question"
                               onclick="$('#modal-answer-${post['_id']}').addClass('is-active')"
                               />
 

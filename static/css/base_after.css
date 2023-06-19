@@ -94,3 +94,29 @@
     background-color: rgba(137, 137, 137, 0.192);
     color: rgb(45, 45, 45);
   }
+
+  .btn_active{
+    text-align: start; 
+    background-color: rgba(19, 229, 187, 0.204); 
+    border: none;
+  }
+
+  .btn_inactive{
+    text-align: start; 
+    background-color: rgba(9, 16, 58, 0.131); 
+    border: none;
+  }
+
+  .btn_active:hover{
+    text-align: start; 
+    background-color: rgba(27, 169, 141, 0.505); 
+    border: none;
+    color: white;
+  }
+
+  .btn_inactive:hover{
+    text-align: start; 
+    background-color: rgba(9, 16, 58, 0.524); 
+    border: none;
+    color: white;
+  }

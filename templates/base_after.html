@@ -33,33 +33,6 @@
 
     <link rel="stylesheet" href="../static/css/mystyle.css">
     <link rel="stylesheet" href="../static/css/base_after.css">
-    <style>
-      .btn_active{
-        text-align: start; 
-        background-color: rgba(19, 229, 187, 0.204); 
-        border: none;
-      }
-
-      .btn_inactive{
-        text-align: start; 
-        background-color: rgba(9, 16, 58, 0.131); 
-        border: none;
-      }
-
-      .btn_active:hover{
-        text-align: start; 
-        background-color: rgba(27, 169, 141, 0.505); 
-        border: none;
-        color: white;
-      }
-
-      .btn_inactive:hover{
-        text-align: start; 
-        background-color: rgba(9, 16, 58, 0.524); 
-        border: none;
-        color: white;
-      }
-    </style>
     <!-- Block untuk Title -->
     {% block head %}
         
@@ -157,13 +130,15 @@
         </a>
       </div>
       
-      <li><a href="/topics" class="btn is-radiusless w-100 px-5 has-text-weight-bold" style="text-align: start; background-color: rgba(9, 16, 58, 0.131); border: none;"><span class="ps-3">Topics</span></a></li>
+      <li class="d-flex flex-row">
+        <span id="span_topics" class="is-hidden" style="background-color: rgb(0, 192, 131); color: white; width: 10px; height: 36px;"></span>
+        <a href="/topics" id="btn_topics" onclick="toggle_topics()" class="btn btn_inactive is-radiusless w-100 px-5 has-text-weight-bold"><span class="ps-3">Topics</span></a></li>
       <div>
-        <a class="buttonsidebar2 ps-5" href="/topics"><span>Nutrisi dan Diet</span></a>
-        <a class="buttonsidebar2 ps-5" href="/topics"><span>Pencegahan penyakit</span></a>
-        <a class="buttonsidebar2 ps-5" href="/topics"><span>Olahraga dan kebugaran</span></a>
-        <a class="buttonsidebar2 ps-5" href="/topics"><span>Perawatan kulit alami</span></a>
-        <a class="buttonsidebar2 ps-5" href="/topics"><span>Perawatan wajah</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topic/nutrition"><span>Nutrisi dan Diet</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topic/prevention"><span>Pencegahan penyakit</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topic/fitness"><span>Olahraga dan kebugaran</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topic/natural-skin-care"><span>Perawatan kulit alami</span></a>
+        <a class="buttonsidebar2 ps-5" href="/topic/facial-care"><span>Perawatan wajah</span></a>
         <a class="buttonsidebar2 ps-5 has-text-weight-bold" href="/topics"><span>See More</span></a>
       </div>
       <hr class="separator" style="margin-top: 20px; margin-bottom: 20px;">
@@ -255,7 +230,8 @@
           $('#btn_discussions').removeClass("btn_active")
           $('#btn_urquestion').addClass("btn_active")
           $('#btn_urquestion').removeClass("btn_inactive")
-          
+          $('#btn_topics').addClass("btn_inactive")
+          $('#btn_topics').removeClass("btn_active")
         }
         function toggle_btndiscussions(){
           get_posts()
@@ -265,6 +241,20 @@
           $('#btn_urquestion').removeClass("btn_active")
           $('#btn_discussions').addClass("btn_active")
           $('#btn_discussions').removeClass("btn_inactive")
+          $('#btn_topics').addClass("btn_inactive")
+          $('#btn_topics').removeClass("btn_active")
+          
+        }
+        function toggle_topics(){
+          $('#span_urquestion').addClass("is-hidden")
+          $('#span_discussions').addClass("is-hidden")
+          $('#span_topics').removeClass("is-hidden")
+          $('#btn_urquestion').addClass("btn_inactive")
+          $('#btn_urquestion').removeClass("btn_active")
+          $('#btn_discussions').addClass("btn_inactive")
+          $('#btn_discussions').removeClass("btn_active")
+          $('#btn_topics').addClass("btn_active")
+          $('#btn_topics').removeClass("btn_inactive")
           
         }
         function toggle_sidebar(){

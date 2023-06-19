@@ -92,14 +92,64 @@ def edit_post(id_post):
             )
             user_info = db.normal_users.find_one({'username':payload.get('id')})
             user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            post = db.posts.find_one({'_id':ObjectId(id_post)})
+            
+            doc = {
+                '_id':str(post['_id']),
+                'id_user':post['id_user'],
+                'title':post['title'],
+                'question':post['question'],
+                'topic':post['topic'],
+                'date':post['date'],
+                'post_pic_real':post['post_pic_real'],
+                'post_pic':post['post_pic']
+            }
             
             if user_info:
                 if user_info['role'] == 'admin':
                     return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
                 else:   
-                    return render_template('create_post.html',user_info=user_info)
+                    return render_template('edit_post.html',post=doc,user_info=user_info)
             elif user_info2:
-                return render_template('create_post.html',user_info=user_info2)
+                return render_template('edit_post.html',post=doc,user_info=user_info2)
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+    
+@app.route('/delete/<id_post>')
+def delete_post(id_post):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            post = db.posts.find_one({'_id':ObjectId(id_post)})
+            
+            if post:
+                if user_info:
+                    if user_info['role'] == 'admin':
+                        return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
+                    else:
+                        db.posts.delete_one({'_id':ObjectId(id_post)})   
+                        db.answers.delete_many({'id_post':id_post})   
+                        return render_template('forum_after.html',user_info=user_info, msg=f'Your post ({post["title"]}) has been deleted')
+                elif user_info2:
+                    db.posts.delete_one({'_id':ObjectId(id_post)})
+                    db.answers.delete_many({'id_post':id_post})     
+                    return render_template('forum_after.html',user_info=user_info2, msg=f'Your post ({post["title"]}) has been deleted')
+            else:
+                return redirect(url_for('index'))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -749,6 +799,92 @@ def posting():
                 "result": "success",
                 "msg": "Posting successful!"
                 })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
+@app.route("/post_editing", methods=["POST"])
+def post_editing():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        
+        id_post = request.form['id_post']
+        id_user = request.form['id_user']
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':username})
+        user_info2 = db.expert_users.find_one({'username':username})
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+                
+        title_receive = request.form["title_give"]
+        question_receive = request.form["question_give"]
+        topic_receive = request.form["topic_give"]
+        date_receive = request.form["date_give"]
+        
+        if user_info:
+            if str(user_info['_id']) == id_user:
+                doc = {
+                    "id_user": str(user_info["_id"]),
+                    "title": title_receive,
+                    "question": question_receive,
+                    "topic": topic_receive,
+                    "date": date_receive
+                }
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"post_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["post_pic"] = filename
+                    doc["post_pic_real"] = file_path
+                    
+                    
+                db.posts.update_one({"_id": ObjectId(id_post)}, {"$set": doc})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Post has been edited"
+                    })
+            elif user_info['_id'] != id_user:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You don't have permission to do this"
+                    })
+                    
+        elif user_info2:
+            if str(user_info2['_id']) == id_user:
+                doc = {
+                    "id_user": str(user_info2["_id"]),
+                    "title": title_receive,
+                    "question": question_receive,
+                    "topic": topic_receive,
+                    "date": date_receive
+                }
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"post_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["post_pic"] = filename
+                    doc["post_pic_real"] = file_path
+                    
+                db.posts.update_one({"_id": ObjectId(id_post)}, {"$set": doc})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Post has been edited"
+                    })
+            elif user_info2['_id'] != id_user:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You don't have permission to do this"
+                    })
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))

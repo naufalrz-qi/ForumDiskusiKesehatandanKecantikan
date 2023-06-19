@@ -17,8 +17,10 @@
         <div class="dropdown is-right" id="post_drop">
           <div class="dropdown-menu">
             <div class="dropdown-content">
+              {% if post.username == user_info.username %}
               <a class="dropdown-item" href="/edit_post/{{ post._id }}"><span>Edit Post</span></a>
               <a class="dropdown-item" href="/delete/{{ post._id }}"><span>Delete Post</span></a>
+              {% endif %}  
               <a class="dropdown-item" onclick=""><span>Report</span></a>
             </div>
           </div>
@@ -74,7 +76,7 @@
                                           <div class="media-content p-5">
                                               <div class="field">
                                                   <p class="control">
-                                                      <textarea id="textarea-answer" class="textarea"
+                                                      <textarea id="textarea-answer-{{ post._id }}" class="textarea"
                                                                 placeholder="Answer the question"></textarea>
                                                   </p>
                                               </div>
@@ -83,7 +85,7 @@
                                         <div class="file has-name py-2">
                                           <label class="file-label" style="width: 100%">
                                             <input
-                                              id="input_answer_pic"
+                                              id="input_answer_pic_{{ post._id }}"
                                               class="file-input"
                                               type="file"
                                               name="resume"

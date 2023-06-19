@@ -1,3 +1,45 @@
+function edit(id_post, id_user) {
+    let title = $("#input_title").val()+'[edited]'
+    let input_question = $("#input_question").val()
+    let topic = $("#select_topic").val()
+    let file = $("#input_pic")[0].files[0]
+
+    let paragraph = input_question.split("\n")
+    let question = ""
+    for(let i = 0; i<paragraph.length; i++){
+      question += paragraph[i]+"<br>";
+    }
+    let form_data = new FormData();
+    let today = new Date().toISOString()
+    form_data.append("id_post", id_post);
+    form_data.append("id_user", id_user);
+    form_data.append("title_give", title);
+    form_data.append("question_give", question);
+    form_data.append("topic_give", topic);
+    form_data.append("file_give", file);
+    form_data.append("date_give", today);
+    console.log(form_data);
+    $.ajax({
+        type: "POST",
+        url: "/post_editing",
+        data:form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (response["result"] === "success") {
+                alert(response["msg"]);
+                window.location.replace('/')
+              }
+              else if (response["result"] === "failed") {
+                alert(response["msg"]);
+                window.location.replace('/')
+              }
+            
+        }
+    })
+}
+
 function post() {
     let title = $("#input_title").val()
     let input_question = $("#input_question").val()
@@ -36,8 +78,8 @@ function post() {
 
 
 function answer(id_post) {
-    let input_answer = $("#textarea-answer").val()
-    let file = $("#input_answer_pic")[0].files[0]
+    let input_answer = $("#textarea-answer-"+id_post).val()
+    let file = $("#input_answer_pic_"+id_post)[0].files[0]
     let paragraph = input_answer.split("\n")
     let answer = ""
     for(let i = 0; i<paragraph.length; i++){
@@ -62,7 +104,7 @@ function answer(id_post) {
                 alert(response["msg"]);
 
                 //you should direct the user into discussion details
-                window.location.replace('/')
+                window.location.reload()
               }
             else if(response["result"] === 'failed'){
               alert(response['msg'])
@@ -74,7 +116,7 @@ function answer(id_post) {
 
   function get_posts2() {
     
-    username = '';
+    let username = '';
   
     $.ajax({
       type: "GET",
@@ -169,6 +211,14 @@ function get_posts(username) {
     } else {
         class_heart = "fa-heart-o"
     }*/
+    const username = $('script[data-username]').data('username');
+    console.log(username)
+    let editPostHtml = '';
+    if (post['username'] === username) {
+    editPostHtml = `<a class="dropdown-item" href="/edit_post/${post['_id']}"><span>Edit post</span></a>
+                    <a class="dropdown-item" href="/delete/${post['_id']}"><span>Delete Post</span></a>
+    `;
+    }
 
     let html_temp = `
     
@@ -182,6 +232,7 @@ function get_posts(username) {
             <div class="dropdown is-right" id="post_drop_${post['_id']}">
               <div class="dropdown-menu">
                 <div class="dropdown-content">
+                  ${editPostHtml}
                   <a class="dropdown-item" href="/post_detail/${post['_id']}"><span>View Detail</span></a>
                   <a class="dropdown-item" onclick=""><span>Report</span></a>
                 </div>
@@ -206,7 +257,7 @@ function get_posts(username) {
                 </div>
                 
                 <div class="mt-5">
-                    <p style="padding-bottom:5%;">${post['question']}</p>
+                    <p>${post['question']}</p>
                     
                       
                     <div class="d-flex justify-content-center">
@@ -219,7 +270,7 @@ function get_posts(username) {
             <hr class="separator m-0 mb-3 p-0">
             <section id="answer" class="p-3">
               <p class="h6">Answer Section</p>
-              <article class="media">
+              <article class="media" style="margin-bottom:0px">
                   <div class="media-content my">
                       <div class="field">
                           <p class="control">
@@ -238,7 +289,7 @@ function get_posts(username) {
                                               <div class="media-content p-5">
                                                   <div class="field">
                                                       <p class="control">
-                                                          <textarea id="textarea-answer" class="textarea"
+                                                          <textarea id="textarea-answer-${post['_id']}" class="textarea"
                                                                     placeholder="Answer the question"></textarea>
                                                       </p>
                                                   </div>
@@ -247,7 +298,7 @@ function get_posts(username) {
                                             <div class="file has-name py-2">
                                               <label class="file-label" style="width: 100%">
                                                 <input
-                                                  id="input_answer_pic"
+                                                  id="input_answer_pic_${post['_id']}"
                                                   class="file-input"
                                                   type="file"
                                                   name="resume"
@@ -299,6 +350,7 @@ function get_posts(username) {
     `;
     $("#discussion").append(html_temp);
   }
+
   function getAnswer(postID) {
     $.ajax({
     type:"POST",
@@ -378,7 +430,8 @@ function get_posts(username) {
       }
     }
 
-  })  }
+  })  
+}
 
   function getAnswer_detail(postID) {
     $.ajax({
@@ -426,7 +479,9 @@ function get_posts(username) {
       }
     }
 
-  })  }
+  })  
+}
+
   function time2str(date) {
     let today = new Date();
     let time = (today - date) / 1000 / 60;  // minutes

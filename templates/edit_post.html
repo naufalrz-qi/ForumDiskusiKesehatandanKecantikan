@@ -1,0 +1,100 @@
+{% extends 'base_after.html' %}
+{% block head %}
+    <title>Edit Post</title>
+{% endblock %}
+{% block title %}
+    <p class="has-text-weight-bold">Edit Post</p>
+{% endblock %}
+{% block body %}
+<div class="card w-100 p-5" style="border-radius: 3%;">
+    <div class="card-body ">
+        <p class="h3 d-flex justify-content-center">Edit Post</p>
+        <div class="field">
+            
+            <label class="label">Title</label>
+            <div class="control">
+              <input id="input_title" class="input" type="text" placeholder="Title" value="{{ post.title }}">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Question</label>
+            <div class="control">
+              <textarea id="input_question" class="textarea" placeholder="Question"></textarea>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Topic</label>
+            <div class="control">
+              <div class="select">
+                <select id="select_topic">
+                  <option class="has-text-weight-bold" disabled>--Kesehatan--</option>
+                  <option value="Gaya hidup sehat">Gaya hidup sehat</option>
+                  <option value="Nutrisi dan diet">Nutrisi dan diet</option>
+                  <option value="Olahraga dan kebugaran">Olahraga dan kebugaran</option>
+                  <option class="has-text-weight-bold" disabled>--Kecantikan--</option>
+                  <option value="Produk perawatan kulit">Produk perawatan kulit</option>
+                  <option value="Gaya rambut">Gaya rambut</option>
+                  <option value="Tips dan trik kecantikan">Tips dan trik kecantikan</option>
+                  <option class="has-text-weight-bold" disabled>--Lainnya--</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field control is-expanded">
+            <label class="label">Add image</label>
+            <div class="file has-name">
+              <label class="file-label" style="width: 100%">
+                <input
+                  id="input_pic"
+                  class="file-input"
+                  type="file"
+                  name="resume"
+                />
+                <span class="file-cta"
+                  ><span class="file-icon"
+                    ><i class="fa fa-upload"></i
+                  ></span>
+                  <span class="file-label">Select a file</span>
+                </span>
+                <span
+                  id="file_name"
+                  class="file-name"
+                  style="width: 100%; max-width: 100%"
+                  >{{ post.post_pic }}</span
+                >
+              </label>
+            </div>
+          </div>
+          
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-primary" onclick="edit('{{ post._id }}','{{ post.id_user }}')">Publish</button>
+            </div>
+            <div class="control">
+              <a class="button is-link is-light" href="/">Cancel</a>
+            </div>
+          </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+    <script src="../static/js/forum.js"></script>
+    <script>
+      $(document).ready(function () {
+          $("#popular-posts").empty()
+          $("#must-read").empty()
+          get_posts2()
+          $('#select_topic').val('{{ post.topic }}')
+          let questionText = "{{ post.question|safe }}"
+          console.log(questionText)
+          questionText = questionText.replace(/<br>/g, '\n');
+          console.log(questionText)
+          $('#input_question').val(questionText);
+      });
+  </script>
+{% endblock %}

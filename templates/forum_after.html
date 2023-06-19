@@ -6,6 +6,7 @@
     <p class="has-text-weight-bold">Forum</p>
 {% endblock %}
 {% block body %}
+<div id="alert"></div>
 <section id="discussion">
     <div class="card-body">
         <p>Title</p>
@@ -25,7 +26,7 @@
 {% endblock %}
 
 {% block script %}
-    <script src="../static/js/forum.js"></script>
+    <script src="../static/js/forum.js" data-username="{{ user_info.username }}"></script>
     <script>
         $(document).ready(function () {
             get_posts()
@@ -33,7 +34,27 @@
             $("#popular-posts").empty()
             $("#must-read").empty()
             get_posts2()
-          
+
+            var messageStatus = "{{ msg }}" || "";
+
+            if (messageStatus.startsWith('Your post') && messageStatus.endsWith('has been deleted')) {
+                showAlert(messageStatus);
+            }
+
+            // Fungsi untuk menampilkan pesan alert
+            function showAlert(message) {
+                // Buat elemen alert dengan pesan
+                var alertElement = $('<div>').addClass('alert alert-danger').text(message);
+
+                // Tambahkan elemen alert ke dalam div id alert
+                $('#alert').prepend(alertElement);
+
+                // Hilangkan alert setelah beberapa detik
+                setTimeout(function() {
+                alertElement.remove();
+                }, 10000);
+            }
+        
         });
     </script>
 {% endblock %}

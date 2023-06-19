@@ -175,7 +175,8 @@ def report_data():
             
             if user_info:
                 if user_info['role'] == 'admin':
-                    return render_template('report_data.html',user_info=user_info)
+                    reportDatas = list(db.reports.find({},{'_id':False}))
+                    return render_template('report_data.html',user_info=user_info,reportDatas=reportDatas)
                 else: 
                     return render_template('forum_after.html',user_info=user_info)
             elif user_info2:
@@ -189,6 +190,59 @@ def report_data():
             return redirect(url_for('login', msg=msg))
     else:
         return redirect(url_for('login'))
+    
+@app.route('/submit_report', methods=['POST'])
+def submit_report():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            id_post = request.form.get('id_post')
+            issue_type = request.form.get('issueType')
+            description = request.form.get('description')
+            
+            # Create a new report document
+           
+            
+            if user_info:
+                report = {
+                    'by_user':str(user_info['_id']),
+                    'link':'/post_detail/'+id_post,
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            elif user_info2:
+                report = {
+                    'by_user':str(user_info2['_id']),
+                    'link':'/post_detail/'+id_post,
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+   
     
 @app.route('/register')
 def register():

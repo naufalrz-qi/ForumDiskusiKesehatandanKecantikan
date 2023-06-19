@@ -201,6 +201,13 @@ function get_posts(username) {
   }
   }
 
+  function confirmDelete(postId) {
+    if (confirm("Are you sure you want to delete this post?")) {
+      // Jika pengguna menekan "OK" pada dialog konfirmasi, maka hapus postingan
+      window.location.href = "/delete/" + postId;
+    }
+  }
+
   function showPost(post, time_post) {  
     let time_before = time2str(time_post);
     let class_heart = post['heart_by_me'] ? "fa-heart": "fa-heart-o"
@@ -212,11 +219,11 @@ function get_posts(username) {
         class_heart = "fa-heart-o"
     }*/
     const username = $('script[data-username]').data('username');
-    console.log(username)
+    let id_post = post['_id']
     let editPostHtml = '';
     if (post['username'] === username) {
     editPostHtml = `<a class="dropdown-item" href="/edit_post/${post['_id']}"><span>Edit post</span></a>
-                    <a class="dropdown-item" href="/delete/${post['_id']}"><span>Delete Post</span></a>
+                    <a class="dropdown-item" href="#" onclick="confirmDelete('${post['_id']}')"><span>Delete Post</span></a>
     `;
     }
 
@@ -234,7 +241,7 @@ function get_posts(username) {
                 <div class="dropdown-content">
                   ${editPostHtml}
                   <a class="dropdown-item" href="/post_detail/${post['_id']}"><span>View Detail</span></a>
-                  <a class="dropdown-item" onclick=""><span>Report</span></a>
+                  <a class="dropdown-item" href="#" onclick="showReportModal('${post['_id']}')"><span>Report</span></a>
                 </div>
               </div>
             </div>
@@ -345,10 +352,93 @@ function get_posts(username) {
                  
               </div>
             </section>
+                          <!-- Modal Report -->
+              <div id="reportModal" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Report Post</p>
+                    <button class="delete" aria-label="close" onclick="closeModal()"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <div class="field">
+                      <label class="label" for="issueType">Type of Issue</label>
+                      <div class="control">
+                        <div class="select">
+                          <select id="issueType">
+                            <option value="Technical Error" selected>Technical Error</option>
+                            <option value="Unclear Question">Unclear Question</option>
+                            <option value="Rule Violation">Rule Violation</option>
+                            <option value="Irrelevant Content">Irrelevant Content</option>
+                            <option value="Discrimination or Harassment">Discrimination or Harassment</option>
+                            <option value="Spam">Spam</option>
+                            <option value="Inaccurate Information">Inaccurate Information</option>
+                            <option value="Repeated Question">Repeated Question</option>
+                            <option value="Inappropriateness">Inappropriateness</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label class="label" for="issueDescription">Description</label>
+                      <div class="control">
+                        <textarea class="textarea" id="issueDescription"></textarea>
+                      </div>
+                    </div>
+                  </section>
+                  <footer class="modal-card-foot">
+                    <button class="button is-primary" onclick="submitReport('${id_post}')">Submit</button>
+                    <button class="button" onclick="closeModal()">Cancel</button>
+                  </footer>
+                </div>
+              </div>
+
         </div>
         
     `;
     $("#discussion").append(html_temp);
+  }
+
+  function closeModal() {
+    // Hide the modal
+    $(".modal").removeClass("is-active");
+    
+    $("#description").val("");
+  }
+
+  function submitReport(id_post) {
+    // Get the values from the input fields
+    let issueType = $("#issueType").val();
+    let description = $("#issueDescription").val();
+    
+    // Perform validation, e.g., check if the fields are empty
+    
+    // Create an object to store the report data
+    let reportData = {
+      id_post:id_post,
+      issueType: issueType,
+      description: description
+    };
+    
+    // Perform an AJAX request to submit the report data to the server
+    $.ajax({
+      url: "/submit_report",
+      type: "POST",
+      data: reportData,
+      success: function(response) {
+        // Handle the success response from the server
+        alert(response['msg'])
+        // Close the modal
+        closeModal();
+      }
+    });
+  }
+  
+  function showReportModal(postId) {
+    // Dapatkan modal element menggunakan ID
+    let modal = $("#reportModal");
+    modal.addClass("is-active");
   }
 
   function getAnswer(postID) {

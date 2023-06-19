@@ -19,7 +19,7 @@
             <div class="dropdown-content">
               {% if post.username == user_info.username %}
               <a class="dropdown-item" href="/edit_post/{{ post._id }}"><span>Edit Post</span></a>
-              <a class="dropdown-item" href="/delete/{{ post._id }}"><span>Delete Post</span></a>
+              <a class="dropdown-item" href="#" onclick="confirmDelete('{{ post._id }}')"><span>Delete Post</span></a>
               {% endif %}  
               <a class="dropdown-item" onclick=""><span>Report</span></a>
             </div>

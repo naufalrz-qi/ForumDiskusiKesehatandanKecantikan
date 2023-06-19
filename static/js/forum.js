@@ -274,7 +274,7 @@ function get_posts(username) {
             </div>
 
             
-            <hr class="separator m-0 mb-3 p-0">
+            <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <section id="answer" class="p-3">
               <p class="h6">Answer Section</p>
               <article class="media" style="margin-bottom:0px">

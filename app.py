@@ -215,6 +215,8 @@ def submit_report():
                 report = {
                     'by_user':str(user_info['_id']),
                     'link':'/post_detail/'+id_post,
+                    'username':user_info['username'],
+                    'id_post':id_post,
                     'issue_type': issue_type,
                     'description': description
                 }
@@ -226,6 +228,8 @@ def submit_report():
                 report = {
                     'by_user':str(user_info2['_id']),
                     'link':'/post_detail/'+id_post,
+                    'username':user_info2['username'],
+                    'id_post':id_post,
                     'issue_type': issue_type,
                     'description': description
                 }

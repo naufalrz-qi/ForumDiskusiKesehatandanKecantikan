@@ -39,6 +39,8 @@
 
             if (messageStatus.startsWith('Your post') && messageStatus.endsWith('has been deleted')) {
                 showAlert(messageStatus);
+            }else if( messageStatus.endsWith('admin')){
+                showAlert(messageStatus);
             }
 
             // Fungsi untuk menampilkan pesan alert

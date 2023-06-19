@@ -229,8 +229,8 @@ function get_posts(username) {
 
     let html_temp = `
     
-        <div class="card w-100 p-3 my-3" style="border-radius: 30px;">
-            <div class="card-body">
+        <div class="card w-100 my-3" style="border-radius: 30px;">
+            <div class="card-body p-5">
             <div class="d-flex flex-row mb-5">
             <div class="col-11">
               <a class="btn btn-success p-1 m-0" href="" style="font-size:10px; width: fit-content;">${post['topic']}</a>
@@ -267,19 +267,20 @@ function get_posts(username) {
                     <p>${post['question']}</p>
                     
                       
-                    <div class="d-flex justify-content-center">
-                        <img src="../static/${post['post_pic_real']}" alt="" style="object-fit: contain; height: 300px;">
-                    </div>
+                    
                 </div>
+            </div>
+            <div class="d-flex justify-content-center" onclick="$('#img_post_${post['_id']}').toggleClass('w-100')" style="height: 300px;">
+                <img id="img_post_${post['_id']}" src="../static/${post['post_pic_real']}" alt="" class="w-100" style="object-fit: cover;">
             </div>
 
             
             <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <section id="answer" class="p-3">
-              <p class="h6 has-text-weight-bold"><a class="text-body-secondary" href="/post_detail/${post['_id']}" >See another answer</a></p>
+              <p class="h6 has-text-weight-bold px-lg-3"><a class="text-body-secondary" href="/post_detail/${post['_id']}" >See another answer</a></p>
               <article class="media" style="margin-bottom:0px;">
                   <div class="media-content">
-                      <div class="field">
+                      <div class="field px-lg-3">
                           <p class="control">
                               <input 
                               id="input-answer"

@@ -65,7 +65,7 @@ def create_post():
             
             if user_info:
                 if user_info['role'] == 'admin':
-                    return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
+                    return render_template('forum_after.html',user_info=user_info, msg="You are an admin")
                 else:   
                     return render_template('create_post.html',user_info=user_info)
             elif user_info2:

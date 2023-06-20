@@ -441,6 +441,63 @@ def submit_report():
     else:
         return redirect(url_for('login'))
    
+@app.route('/submit_report_reply', methods=['POST'])
+def submit_report_reply():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            id_reply = request.form.get('id_reply')
+            answer_id = request.form.get('id_answer')
+            issue_type = request.form.get('issueType')
+            description = request.form.get('description')
+            
+            # Create a new report document
+           
+            reply = db.replies.find_one({'_id':ObjectId(id_reply)})
+            if user_info:
+                report = {
+                    'by_user':str(user_info['_id']),
+                    'link':'/post_detail/'+reply['post_id']+'#answer_'+answer_id,
+                    'username':user_info['username'],
+                    'id_post':reply['post_id'],
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            elif user_info2:
+                report = {
+                    'by_user':str(user_info2['_id']),
+                    'link':'/post_detail/'+reply['post_id']+'#answer_'+answer_id,
+                    'username':user_info['username'],
+                    'id_post':reply['post_id'],
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+   
 @app.route('/submit_report_answer', methods=['POST'])
 def submit_report_answer():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -455,7 +512,7 @@ def submit_report_answer():
             user_info2 = db.expert_users.find_one({'username':payload.get('id')})
             
             id_post = request.form.get('id_post')
-            id_user = request.form.get('id_user')
+            answer_id = request.form.get('id_answer')
             issue_type = request.form.get('issueType')
             description = request.form.get('description')
             
@@ -465,7 +522,7 @@ def submit_report_answer():
             if user_info:
                 report = {
                     'by_user':str(user_info['_id']),
-                    'link':'/post_detail/'+id_post+'#answer_'+id_user,
+                    'link':'/post_detail/'+id_post+'#answer_'+answer_id,
                     'username':user_info['username'],
                     'id_post':id_post,
                     'issue_type': issue_type,
@@ -478,7 +535,7 @@ def submit_report_answer():
             elif user_info2:
                 report = {
                     'by_user':str(user_info2['_id']),
-                    'link':'/post_detail/'+id_post+'/#answer_'+id_user,
+                    'link':'/post_detail/'+id_post+'/#answer_'+answer_id,
                     'username':user_info2['username'],
                     'id_post':id_post,
                     'issue_type': issue_type,
@@ -995,6 +1052,70 @@ def edit_answer():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
     
+@app.route("/edit_reply", methods=["POST"])
+def edit_reply():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+        
+
+        reply_receive = request.form["reply_give"]
+        id_answer= request.form["id_answer"]
+        id_reply = request.form["id_reply"]
+        date_receive = request.form["date_give"]
+        
+        if user_info:
+            if user_info['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "answer_id": id_answer,
+                    "id_user": str(user_info["_id"]),
+                    "reply": reply_receive,
+                    "date": date_receive
+                }
+                
+               
+                db.replies.update_one({"_id": ObjectId(id_reply)}, {"$set": doc})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Edit reply successful!"
+                    })
+            
+        elif user_info2:
+            if user_info2['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "answer_id": id_answer,
+                    "id_user": str(user_info2["_id"]),
+                    "reply": reply_receive,
+                    "date": date_receive
+                }
+               
+                db.replies.update_one({"_id": ObjectId(id_reply)}, {"$set": doc})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Edit reply successful!"
+                    })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
     
 @app.route("/delete_answer", methods=["POST"])
 def delete_answer():
@@ -1037,6 +1158,52 @@ def delete_answer():
                 return jsonify({
                     "result": "success",
                     "msg": "Answering successfully deleted!"
+                    })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
+@app.route("/delete_reply", methods=["POST"])
+def delete_reply():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+
+        id_reply = request.form["id_reply"]
+        
+        if user_info:
+            if user_info['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+
+                db.replies.delete_one({"_id": ObjectId(id_reply)})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Reply successfully deleted!"
+                    })
+        
+            
+        elif user_info2:
+            if user_info2['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:               
+                db.replies.delete_one({"_id": ObjectId(id_reply)})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Reply successfully deleted!"
                     })
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):

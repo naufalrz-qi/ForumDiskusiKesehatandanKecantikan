@@ -615,6 +615,11 @@ function get_posts_by_topic(topic) {
     let modal = $("#reportModalAnswer");
     modal.addClass("is-active");
   }
+  function showReportModalReply() {
+    // Dapatkan modal element menggunakan ID
+    let modal = $("#reportModalReply");
+    modal.addClass("is-active");
+  }
 
   function getAnswer(postID) {
     
@@ -879,32 +884,6 @@ function get_posts_by_topic(topic) {
   })  
 }
 
-function sendReply(answerId, postID, userReplyTo) {
-  
-  let replyText = $('#input-reply-'+answerId).val();
-  let date = new Date().toISOString()
-  console.log(replyText)
-  $.ajax({
-    type: "POST",
-    url: "/submit_reply",
-    data: {
-      post_id: postID,
-      answer_id: answerId,
-      reply: replyText,
-      date:date
-    },
-    success: function(response) {
-      if (response.result === "success") {
-        alert("Your reply has been sended");
-        $(`#reply_toggle_`+answerId).text('reply('+num2str(response["count_replies"])+')');
-        getReplies_detail(answerId,userReplyTo)
-        toggleReplyContainer(answerId)
-      }
-    },
-  });
-}
-
-
 function toggleReplyContainer(answerID) {
   $(`#reply_${answerID} input.reply-input`).val('');
   $(`#reply_${answerID}`).toggle();
@@ -920,16 +899,23 @@ function toggleReplyContainer(answerID) {
       if (response["result"] === "success") {
         let replies = response["replies"];
         let count_replies = replies['count_replies']
+        const username = $('script[data-username]').data('username');
         console.log(response['replies'])
         if(replies.length>0){
           for (let i = 0; i < replies.length; i++) {
               let reply = replies[i];
               let time_reply = new Date(reply["date"]);
               let time_before2 = time2str(time_reply);
+              let editReplyHtml = ''
+              if (reply['username'] === username) {
+                editReplyHtml = `<a class="dropdown-item" onclick="editReply('${reply['_id']}','${answerID}')"><span>Edit Reply</span></a>
+                                <a class="dropdown-item" onclick="confirmDeleteReply('${reply['_id']}')"><span>Delete Reply</span></a>
+                `;
+                }
               let reply_temp =
                   `
                   
-                      <div class="d-flex flex-row mt-4 mb-4">
+                      <div id="reply_${reply['_id']}" class="d-flex flex-row mt-4 mb-4">
                           <a class="image is-48x48" style="width:62px;" href="/user/${reply["username"]}">
                               <img class="is-rounded" style="width:48px;" src="../static/${reply["profile_pic_real"]}"
                                   alt="Image">
@@ -943,11 +929,60 @@ function toggleReplyContainer(answerID) {
                               <small>@${reply["username"]}</small> <small>${time_before2}</small>      
                               </p>
                             
-                              <p>${reply['reply']}</p>
-                            
-                          </div>
-                      </div>
+                              <p id="${reply['_id']}">${reply['reply']}</p>
 
+                          </div>
+                          <div class="d-flex justify-content-center align-content-center align-items-center" style="height: 87px;">
+                              <a class="bi bi-three-dots " id="reply_drop_toggle_${reply["_id"]}" aria-controls="reply_drop_${reply["_id"]}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px; color: inherit; "></a>
+                              <div class="dropdown-menu" id="reply_drop_${reply["_id"]}" aria-labelledby="reply_drop_toggle_${reply["_id"]}">
+                                <div class="dropdown-content">
+                                  ${editReplyHtml}
+                            <a class="dropdown-item" onclick="showReportModalReply()"><span>Report</span></a>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
+                      <!-- Modal Report -->
+                      <div id="reportModalReply" class="modal">
+                        <div class="modal-background"></div>
+                        <div class="modal-card">
+                          <header class="modal-card-head">
+                            <p class="modal-card-title">Report reply</p>
+                            <button class="delete" aria-label="close" onclick="closeModal()"></button>
+                          </header>
+                          <section class="modal-card-body">
+                            <div class="field">
+                              <label class="label" for="issueType">Type of Issue</label>
+                              <div class="control">
+                                <div class="select">
+                                  <select id="issueType">
+                                    <option value="Technical Error" selected>Technical Error</option>
+                                    <option value="Unclear Reply">Unclear Reply</option>
+                                    <option value="Rule Violation">Rule Violation</option>
+                                    <option value="Irrelevant Content">Irrelevant Content</option>
+                                    <option value="Discrimination or Harassment">Discrimination or Harassment</option>
+                                    <option value="Spam">Spam</option>
+                                    <option value="Inaccurate Information">Inaccurate Information</option>
+                                    <option value="Repeated Reply">Repeated Reply</option>
+                                    <option value="Inappropriateness">Inappropriateness</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="field">
+                              <label class="label" for="issueDescription">Description</label>
+                              <div class="control">
+                                <textarea class="textarea" id="issueDescription"></textarea>
+                              </div>
+                            </div>
+                          </section>
+                          <footer class="modal-card-foot">
+                            <button class="button is-primary" onclick="submitReportReply('${answerID}','${reply['_id']}')">Submit</button>
+                            <button class="button" onclick="closeModal()">Cancel</button>
+                          </footer>
+                        </div>
+                      </div>
                   `
 
             
@@ -1013,11 +1048,15 @@ function toggleReplyContainer(answerID) {
                           <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                             
                             <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
-                              <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                              <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
                               <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
+                            </div>
+
+                            <div id=replies_${answer["_id"]}>
                             </div>
                           </div>
                       </div>
+
                       <div class="d-flex justify-content-center align-content-center align-items-center" style="height: 87px;">
                         <a class="bi bi-three-dots " id="answer_drop_toggle_${answer["_id"]}" aria-controls="answer_drop_${answer["_id"]}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px; color: inherit; "></a>
                         <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
@@ -1179,7 +1218,7 @@ function submitReportAnswer(id_post,answerID) {
   // Create an object to store the report data
   let reportData = {
     id_post:id_post,
-    id_user:answerID,
+    id_answer:answerID,
     issueType: issueType,
     description: description
   };
@@ -1195,5 +1234,147 @@ function submitReportAnswer(id_post,answerID) {
       // Close the modal
       closeModal();
     }
+  });
+}
+
+function editReply(replyID,answerID) {
+  let replyElement = $("#" + replyID);
+  let originalContent = replyElement.text();
+
+  let editInput = $("<textarea>").attr({
+    class: "edit-answer",
+  }).text(originalContent.replace(/<br>/g, '\n'));
+
+  replyElement.empty().append(editInput);
+
+  editInput.focus();
+
+  editInput.keydown(function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      let editedContent = editInput.val();
+
+      editing_reply(answerID,editedContent,replyID);
+      let paragraph = editedContent.split("\n")
+      let reply = ""
+      for(let i = 0; i<paragraph.length; i++){
+        reply += paragraph[i]+"<br>";
+      }
+      replyElement.empty().html(reply);
+    }
+  });
+}
+
+function confirmDeleteReply(replyId) {
+  let confirmation = confirm("Apakah Anda yakin ingin menghapus jawaban ini?");
+
+  if (confirmation) {
+    $("#reply_" + replyId).remove();
+    $.ajax({
+      type: "POST",
+      url: "/delete_reply",
+      data:{'id_reply':replyId},
+      success: function (response) {
+          if (response["result"] === "success") {
+              alert(response["msg"]);
+            }
+          else if(response["result"] === 'failed'){
+            alert(response['msg'])
+          }
+          
+      }
+  })
+    
+  }
+}
+
+
+function submitReportReply(answerID,replyID) {
+  // Get the values from the input fields
+  let issueType = $("#issueType").val();
+  let description = $("#issueDescription").val();
+  
+  // Perform validation, e.g., check if the fields are empty
+  
+  // Create an object to store the report data
+  let reportData = {
+    id_answer:answerID,
+    id_reply:replyID,
+    issueType: issueType,
+    description: description
+  };
+  
+  // Perform an AJAX request to submit the report data to the server
+  $.ajax({
+    url: "/submit_report_reply",
+    type: "POST",
+    data: reportData,
+    success: function(response) {
+      // Handle the success response from the server
+      alert(response['msg'])
+      // Close the modal
+      closeModal();
+    }
+  });
+}
+
+function editing_reply(answerID,text,replyID) {
+  let input_reply = text
+  let paragraph = input_reply.split("\n")
+  let reply = ""
+  for(let i = 0; i<paragraph.length; i++){
+    reply += paragraph[i]+"<br>";
+  }
+  let form_data = new FormData();
+  let today = new Date().toISOString()
+  form_data.append("id_answer", answerID);
+  form_data.append("id_reply", replyID);
+  form_data.append("reply_give", reply);
+  form_data.append("date_give", today);
+  console.log(form_data);
+  $.ajax({
+      type: "POST",
+      url: "/edit_reply",
+      data:form_data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+          if (response["result"] === "success") {
+              alert(response["msg"]); 
+            }
+          else if(response["result"] === 'failed'){
+            alert(response['msg'])
+          }
+          
+      }
+  })
+}
+
+function sendReply(answerId, postID, userReplyTo) {
+  
+  let replyText = $('#input-reply-'+answerId).val();
+  let paragraph = replyText.split("\n")
+  let reply = ""
+  for(let i = 0; i<paragraph.length; i++){
+    reply += paragraph[i]+"<br>";
+  }
+  let date = new Date().toISOString()
+
+  $.ajax({
+    type: "POST",
+    url: "/submit_reply",
+    data: {
+      post_id: postID,
+      answer_id: answerId,
+      reply: reply,
+      date:date
+    },
+    success: function(response) {
+      if (response.result === "success") {
+        alert("Your reply has been sended");
+        $(`#reply_toggle_`+answerId).text('reply('+num2str(response["count_replies"])+')');
+        getReplies_detail(answerId,userReplyTo)
+      }
+    },
   });
 }

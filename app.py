@@ -17,6 +17,131 @@ MONGODB_CONNECTION_STRING = 'mongodb+srv://user1:123@cluster0.g1iutgc.mongodb.ne
 client = MongoClient(MONGODB_CONNECTION_STRING)
 db = client.finalprojectForumHnB
 TOKEN_KEY = 'my_token'
+topics_collection = db["topics"]
+
+
+def insert_topics():
+    if topics_collection.count_documents({}) == 0:
+        # Data klasifikasi topik
+        classifications = {
+            "Kesehatan Umum": {
+                "topics": [
+                    {"topic": "Gaya hidup sehat", "index": "lifestyle"},
+                    {"topic": "Nutrisi dan diet", "index": "nutrition"},
+                    {"topic": "Olahraga dan kebugaran", "index": "fitness"},
+                    {"topic": "Kesehatan mental dan kesejahteraan", "index": "mental-health"},
+                    {"topic": "Pencegahan penyakit", "index": "prevention"},
+                    {"topic": "Kesehatan anak-anak dan remaja", "index": "children-health"}
+                ]
+            },
+            "Perawatan Kulit": {
+                "topics": [
+                    {"topic": "Perawatan wajah", "index": "facial-care"},
+                    {"topic": "Produk perawatan kulit", "index": "skincare-products"},
+                    {"topic": "Perawatan kulit alami", "index": "natural-skin-care"},
+                    {"topic": "Masalah kulit (jerawat, penuaan, hiperpigmentasi)", "index": "skin-issues"},
+                    {"topic": "Paparan sinar matahari dan perlindungan dari sinar UV", "index": "sun-protection"}
+                ]
+            },
+            "Rambut dan Perawatan Rambut": {
+                "topics": [
+                    {"topic": "Perawatan rambut (shampoo, kondisioner, perawatan)", "index": "hair-care"},
+                    {"topic": "Gaya rambut", "index": "hairstyles"},
+                    {"topic": "Masalah rambut (kerontokan, ketombe, rambut kering atau berminyak)", "index": "hair-issues"}
+                ]
+            },
+            "Make-up dan Produk Kecantikan": {
+                "topics": [
+                    {"topic": "Aplikasi make-up dan teknik", "index": "makeup-application"},
+                    {"topic": "Produk kosmetik (foundation, lipstik, maskara)", "index": "cosmetic-products"},
+                    {"topic": "Tips dan trik kecantikan", "index": "beauty-tips"}
+                ]
+            },
+            "Kesehatan Mata": {
+                "topics": [
+                    {"topic": "Perawatan mata", "index": "eye-care"},
+                    {"topic": "Penggunaan lensa kontak", "index": "contact-lenses"},
+                    {"topic": "Masalah mata (rabun jauh, rabun dekat, mata kering)", "index": "eye-issues"}
+                ]
+            },
+            "Kesehatan Gigi dan Mulut": {
+                "topics": [
+                    {"topic": "Perawatan gigi (pembersihan, pemutihan gigi)", "index": "dental-care"},
+                    {"topic": "Penyakit gigi dan gusi", "index": "dental-issues"},
+                    {"topic": "Kesehatan mulut (nafas segar, perawatan lidah)", "index": "oral-health"}
+                ]
+            },
+            "Kesehatan Wanita": {
+                "topics": [
+                    {"topic": "Kesehatan reproduksi", "index": "reproductive-health"},
+                    {"topic": "Perawatan kewanitaan", "index": "feminine-care"},
+                    {"topic": "Kehamilan dan persalinan", "index": "pregnancy"},
+                    {"topic": "Masalah menstruasi dan menopause", "index": "menstruation-menopause"}
+                ]
+            },
+            "Kesehatan Pria": {
+                "topics": [
+                    {"topic": "Kesehatan reproduksi pria", "index": "male-reproductive-health"},
+                    {"topic": "Perawatan kulit pria", "index": "male-skin-care"},
+                    {"topic": "Gaya hidup sehat untuk pria", "index": "male-lifestyle"}
+                ]
+            },
+            "Suplemen dan Obat-obatan": {
+                "topics": [
+                    {"topic": "Suplemen makanan", "index": "dietary-supplements"},
+                    {"topic": "Vitamin dan mineral", "index": "vitamins-minerals"},
+                    {"topic": "Pengobatan alternatif", "index": "alternative-medicine"},
+                    {"topic": "Obat-obatan umum", "index": "common-medications"}
+                ]
+            },
+            "Estetika dan Perawatan Tubuh": {
+                "topics": [
+                    {"topic": "Perawatan tubuh (massage, spa)", "index": "body-care"},
+                    {"topic": "Perawatan kuku", "index": "nail-care"},
+                    {"topic": "Prosedur kosmetik non-bedah (filler, botox)", "index": "non-surgical-procedures"}
+                ]
+            },
+            "Kesehatan Alamiah": {
+                "topics": [
+                    {"topic": "Pengobatan herbal dan tradisional", "index": "herbal-traditional-medicine"},
+                    {"topic": "Penggunaan minyak essensial", "index": "essential-oils"},
+                    {"topic": "Terapi alternatif (akupunktur, refleksiologi)", "index": "alternative-therapies"}
+                ]
+            },
+            "Kesehatan Mental dan Emosional": {
+                "topics": [
+                    {"topic": "Manajemen stres", "index": "stress-management"},
+                    {"topic": "Kesehatan pikiran dan kecerdasan emosional", "index": "mental-wellbeing"},
+                    {"topic": "Terapi psikologis dan konseling", "index": "psychological-therapy"}
+                ]
+            },
+            "Kesehatan dan Kecantikan dalam Masyarakat dan Budaya": {
+                "topics": [
+                    {"topic": "Norma kecantikan", "index": "beauty-norms"},
+                    {"topic": "Persepsi tubuh dan citra diri", "index": "body-image"},
+                    {"topic": "Kesehatan dan kecantikan dalam budaya populer", "index": "pop-culture-health-beauty"}
+                ]
+            },
+            "Lainnya": {
+                "topics": [
+                    {"topic": "Lainnya", "index": "others"}
+                ]
+            }
+        }
+
+        # Insert data klasifikasi topik ke dalam collection 'topics'
+        for category, data in classifications.items():
+            topic_data = {
+                "category": category,
+                "topics": data["topics"]
+            }
+            topics_collection.insert_one(topic_data)
+
+        return "Data klasifikasi topik telah diinsert ke dalam MongoDB"
+    else:
+        return "Collection 'topics' sudah berisi data"
+    
+# insert_topics()
 
 @app.route('/')
 def index():
@@ -1031,7 +1156,118 @@ def post_editing():
         return redirect(url_for("index"))
 
 
+@app.route("/topic/<string:topic>", methods=["GET"])
+def urltopics(topic):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                return render_template('post_by_topics.html',user_info=user_info, topic=topic)
+            elif user_info2:
+                return render_template('post_by_topics.html',user_info=user_info2, topic=topic)
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return render_template('index.html')
+    
+@app.route("/get_topics", methods=["GET"])
+def get_topics():
+    categories = db.topics.distinct("category")  # Ambil daftar kategori dari database
+    topics = {}  # Buat kamus untuk menyimpan daftar topik berdasarkan kategori
 
+    for category in categories:
+        category_topics = db.topics.find({"category": category}).distinct("topics")
+        topics[category] = category_topics
+
+    return jsonify({
+        "result": "success",
+        "topics": topics
+    })    
+    
+@app.route("/topic/<string:topic>", methods=["POST"])
+def get_posts_by_topic(topic):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        user_info = db.normal_users.find_one({"username": payload["id"]})
+        user_info2 = db.expert_users.find_one({"username": payload["id"]})
+        list_posts = []
+
+        posts = list(db.posts.find({"topic": topic}).sort("date", -1).limit(10))
+        print(posts)
+
+        for post in posts:
+            user1 = db.normal_users.find_one({'_id': ObjectId(post['id_user'])})
+            user2 = db.expert_users.find_one({'_id': ObjectId(post['id_user'])})
+
+            if user1:
+                doc = {
+                    '_id': str(post['_id']),
+                    'username': user1['username'],
+                    'profile_name': user1['profile_name'],
+                    'profile_pic_real': user1['profile_pic_real'],
+                    'role': user1['role'],
+                    'title': post['title'],
+                    'question': post['question'],
+                    'topic': post['topic'],
+                    'date': post['date'],
+                    'post_pic_real': post['post_pic_real'],
+                    'post_pic': post['post_pic']
+                }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))
+
+            if user2:
+                doc = {
+                    '_id': str(post['_id']),
+                    'username': user2['username'],
+                    'profile_name': user2['profile_name'],
+                    'profile_pic_real': user2['profile_pic_real'],
+                    'role': user2['role'],
+                    'title': post['title'],
+                    'question': post['question'],
+                    'topic': post['topic'],
+                    'date': post['date'],
+                    'post_pic_real': post['post_pic_real'],
+                    'post_pic': post['post_pic']
+                }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))
+
+            list_posts.append(doc)
+
+        return jsonify({
+            "result": "success",
+            "msg": f"Successful fetched posts by topic '{topic}'",
+            'posts': list_posts
+        })
+
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
 @app.route("/get_posts", methods=["GET"])
 def get_posts():
     token_receive = request.cookies.get(TOKEN_KEY)

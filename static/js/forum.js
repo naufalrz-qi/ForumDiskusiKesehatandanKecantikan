@@ -226,7 +226,7 @@ function get_posts(username) {
             <div class="card-body p-5">
             <div class="d-flex flex-row mb-5">
             <div class="col-11">
-              <a class="btn btn-success p-1 m-0" href="" style="font-size:10px; width: fit-content;">${post['topic']}</a>
+              <a id="topics_${post['_id']}" class="btn btn-success p-1 m-0" href="/topic/${post['topic']}" style="font-size:10px; width: fit-content;">${post['topic']}</a>
             </div>
             <a class="bi bi-three-dots-vertical col-1 d-flex justify-content-end" onclick="$('#post_drop_${post['_id']}').toggleClass('is-active')" style="font-size: 18px; color: inherit;"></a>
             <div class="dropdown is-right" id="post_drop_${post['_id']}">
@@ -399,6 +399,25 @@ function get_posts(username) {
         
     `;
     $("#discussion").append(html_temp);
+    let topicsElement = $("#topics_"+id_post);
+
+    // Mendapatkan teks awal dari elemen
+    let originalText = topicsElement.text();
+
+    // Mengganti tanda minus dengan spasi
+    let modifiedText = originalText.replace(/-/g, " ");
+
+    // Mengubah teks menjadi huruf kecil di awal setiap kata
+    if (modifiedText.includes(" ")) {
+      modifiedText = modifiedText.replace(/\b\w/g, function(match) {
+        return match.toUpperCase();
+      });
+    } else {
+      modifiedText = modifiedText.charAt(0).toUpperCase() + modifiedText.slice(1);
+    }
+
+    // Mengatur teks yang telah dimodifikasi ke elemen
+    topicsElement.text(modifiedText);
   }
 
   function num2str(count_number) {
@@ -415,6 +434,59 @@ function get_posts(username) {
     return count
 }
 
+function get_topics() {
+  $.ajax({
+    type: "GET",
+    url: "/get_topics",
+    success: function(response) {
+      if (response["result"] === "success") {
+        let topics = response["topics"];
+        let selectElement = $("#select_topic");
+
+        for (let category in topics) {
+          let categoryGroup = $("<optgroup>").attr("label", category);
+
+          topics[category].forEach(function(topic) {
+            let topicText = topic.topic;
+            let option = $("<option>").val(topic.index).text(topicText);
+            categoryGroup.append(option);
+          });
+
+          selectElement.append(categoryGroup);
+        }
+        
+      }
+    }
+  });
+}
+
+
+function get_posts_by_topic(topic) {
+
+  $("#discussion").empty();   
+  $.ajax({
+    type: "POST",
+    url: '/topic/'+topic,
+    data: {},
+    success: function (response) {
+      if (response["result"] === "success") {
+        let posts = response["posts"];
+        if(posts.length>0){
+          for (let i = 0; i < posts.length; i++) {
+            let post = posts[i];
+            let id= post['_id']
+            let time_post = new Date(post["date"]);
+            
+            showPost(post, time_post)
+            getAnswer(id)
+          }
+        }else{
+          showAlert('There are no posts related to this topic');
+        }
+      }
+    },
+  });
+}
 
   function toggle_up(post_id, type) {
     console.log(post_id, type);

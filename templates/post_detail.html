@@ -11,7 +11,7 @@
         <div class="card-body p-5">
         <div class="d-flex flex-row mb-5">
         <div class="col-11">
-          <a class="btn btn-success p-1 m-0" href="" style="font-size:10px; width: fit-content;">{{ post.topic }}</a>
+          <a id="topics" class="btn btn-success p-1 m-0" href="/topic/{{ post.topic }}" style="font-size:10px; width: fit-content;">{{ post.topic }}</a>
         </div>
         <a class="bi bi-three-dots-vertical col-1 d-flex justify-content-end" onclick="$('#post_drop').toggleClass('is-active')" style="font-size: 18px; color: inherit;"></a>
         <div class="dropdown is-right" id="post_drop">
@@ -202,6 +202,25 @@
             let countUp = '{{ post.count_up }}';
             let countStr = num2str(countUp);
             $(".up-num").text(countStr);
+
+            let topicsElement = $("#topics");
+
+            // Mendapatkan teks awal dari elemen
+            let originalText = topicsElement.text();
+
+            // Mengganti tanda minus dengan spasi
+            let modifiedText = originalText.replace(/-/g, " ");
+
+            if (modifiedText.includes(" ")) {
+              modifiedText = modifiedText.replace(/\b\w/g, function(match) {
+                return match.toUpperCase();
+              });
+            } else {
+              modifiedText = modifiedText.charAt(0).toUpperCase() + modifiedText.slice(1);
+            }
+
+            // Mengatur teks yang telah dimodifikasi ke elemen
+            topicsElement.text(modifiedText);
           
         });
 
@@ -211,5 +230,6 @@
             let temp_html = `${time2}`
             $('#time_before').append(temp_html);
         }
+        
     </script>
 {% endblock %}

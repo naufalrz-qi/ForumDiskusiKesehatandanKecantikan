@@ -126,6 +126,14 @@
     border: none;
     box-shadow: none;
 }
+  .edit-answer:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+  .edit-answer {
+    border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);
+}
 
 .reply-submit:hover {
   background: none !important;

@@ -102,9 +102,44 @@ function answer(id_post) {
         success: function (response) {
             if (response["result"] === "success") {
                 alert(response["msg"]);
+                $(`#answer-`+id_post).empty()
+                getAnswer(id_post)
 
-                //you should direct the user into discussion details
-                window.location.reload()
+              }
+            else if(response["result"] === 'failed'){
+              alert(response['msg'])
+            }
+            
+        }
+    })
+}
+function editing_answer(id_post,text,answerID) {
+    let input_answer = text
+    let file = ''
+    let paragraph = input_answer.split("\n")
+    let answer = ""
+    for(let i = 0; i<paragraph.length; i++){
+      answer += paragraph[i]+"<br>";
+    }
+    let form_data = new FormData();
+    let today = new Date().toISOString()
+    form_data.append("id_post", id_post);
+    form_data.append("id_answer", answerID);
+    form_data.append("answer_give", answer);
+    form_data.append("file_give", file);
+    form_data.append("date_give", today);
+    console.log(form_data);
+    $.ajax({
+        type: "POST",
+        url: "/edit_answer",
+        data:form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (response["result"] === "success") {
+                alert(response["msg"]);
+                
               }
             else if(response["result"] === 'failed'){
               alert(response['msg'])
@@ -601,7 +636,7 @@ function get_posts_by_topic(topic) {
             let editAnswerHtml = '';
 
             if (answer['username'] === username) {
-              editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}')"><span>Edit Answer</span></a>
+              editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
                               <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
               `;
               }
@@ -624,7 +659,8 @@ function get_posts_by_topic(topic) {
                               <small>@${answer["username"]}</small> <small>${time_before2}</small>      
                               </p>
                             
-                              <p>${answer['answer']}</p>
+                              <p id="${answer['_id']}">${answer['answer']}</p>
+
                               
 
                         </div>
@@ -679,7 +715,7 @@ function get_posts_by_topic(topic) {
               let editAnswerHtml = '';
 
               if (answer['username'] === username) {
-                editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}')"><span>Edit Answer</span></a>
+                editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
                                 <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
                 `;
                 }
@@ -702,7 +738,8 @@ function get_posts_by_topic(topic) {
                             <small>@${answer["username"]}</small> <small>${time_before2}</small>      
                             </p>
                           
-                            <p>${answer['answer']}</p>
+                            <p id="${answer['_id']}">${answer['answer']}</p>
+
                             
 
                       </div>
@@ -872,7 +909,7 @@ function toggleReplyContainer(answerID) {
                                 <small>@${answer["username"]}</small> <small>${time_before2}</small>      
                                 </p>
                               
-                                <p>${answer['answer']}</p>
+                                <p id="${answer['answer']}">${answer['answer']}</p>
                                 
   
                           </div>
@@ -926,4 +963,31 @@ function toggleReplyContainer(answerID) {
         return parseInt(time) + " days ago";
     }
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+}
+
+function editAnswer(answerId,postID) {
+  let answerElement = $("#" + answerId);
+  let originalContent = answerElement.text();
+
+  let editInput = $("<textarea>").attr({
+    class: "edit-answer",
+  }).text(originalContent.replace(/<br>/g, '\n'));
+
+  answerElement.empty().append(editInput);
+
+  editInput.focus();
+
+  editInput.keydown(function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      let editedContent = editInput.val();
+
+      editing_answer(postID,editedContent,answerId);
+      let paragraph = editedContent.split("\n")
+      let answer = ""
+      for(let i = 0; i<paragraph.length; i++){
+        answer += paragraph[i]+"<br>";
+      }
+      answerElement.empty().html(answer);
+    }
+  });
 }

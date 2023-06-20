@@ -775,7 +775,7 @@ def answering():
         user_info2 = db.expert_users.find_one({'username':payload.get('id')})
         
         
-         
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         answer_receive = request.form["answer_give"]
         id_post = request.form["id_post"]
         date_receive = request.form["date_give"]
@@ -841,6 +841,95 @@ def answering():
                     doc["answer_pic_real"] = ''  
                     
                 db.answers.insert_one(doc)
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successful!"
+                    })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
+@app.route("/edit_answer", methods=["POST"])
+def edit_answer():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+        
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        answer_receive = request.form["answer_give"]
+        id_post = request.form["id_post"]
+        id_answer = request.form["id_answer"]
+        date_receive = request.form["date_give"]
+        
+        if user_info:
+            if user_info['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "id_post": id_post,
+                    "id_user": str(user_info["_id"]),
+                    "answer": answer_receive,
+                    "date": date_receive
+                }
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"answer_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["answer"] = filename
+                    doc["answer_pic_real"] = file_path 
+                else:
+                    doc["answer_pic"] = ''
+                    doc["answer_pic_real"] = ''  
+                    
+                    
+                db.answers.update_one({"_id": ObjectId(id_answer)}, {"$set": doc})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successful!"
+                    })
+            
+        elif user_info2:
+            if user_info2['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+                doc = {
+                    "id_post": id_post,
+                    "id_user": str(user_info2["_id"]),
+                    "answer": answer_receive,
+                    "date": date_receive
+                }
+                
+                
+                if "file_give" in request.files:
+                    file = request.files["file_give"]
+                    filename = secure_filename(file.filename)
+                    extension = filename.split(".")[-1]
+                    file_path = f"answer_pics/{username}_{date}.{extension}"
+                    file.save("./static/" + file_path)
+                    doc["answer_pic"] = filename
+                    doc["answer_pic_real"] = file_path
+                else:
+                    doc["answer_pic"] = ''
+                    doc["answer_pic_real"] = ''  
+                    
+                db.answers.update_one({"_id": ObjectId(id_answer)}, {"$set": doc})
                 return jsonify({
                     "result": "success",
                     "msg": "Answering successful!"
@@ -1115,7 +1204,7 @@ def posting():
         user_info = db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = db.expert_users.find_one({'username':payload.get('id')})
 
-         
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         title_receive = request.form["title_give"]
         question_receive = request.form["question_give"]
         topic_receive = request.form["topic_give"]
@@ -1200,7 +1289,7 @@ def post_editing():
         question_receive = request.form["question_give"]
         topic_receive = request.form["topic_give"]
         date_receive = request.form["date_give"]
-        
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         if user_info:
             if str(user_info['_id']) == id_user:
                 doc = {

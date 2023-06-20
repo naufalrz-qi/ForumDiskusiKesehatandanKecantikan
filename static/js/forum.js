@@ -249,6 +249,12 @@ function get_posts(username) {
     let class_up = post['up_by_me'] ? "is-primary": "text-body-tertiary"
     const username = $('script[data-username]').data('username');
     let id_post = post['_id']
+    let status_verified = '';
+            if(post["status"] == 'verified'){
+              status_verified = `
+              <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             `
+            }
     let editPostHtml = '';
     if (post['username'] === username) {
     editPostHtml = `<a class="dropdown-item" href="/edit_post/${post['_id']}"><span>Edit post</span></a>
@@ -284,7 +290,8 @@ function get_posts(username) {
                     </a>
                     <div class="d-flex flex-column mx-2">
                         <p class="m-0 p-0">
-                            <strong>${post["profile_name"]}</strong>                 
+                            <strong>${post["profile_name"]}</strong>   
+                            ${status_verified}              
                         </p>
                         <p class="m-0 p-0">
                         <small>@${post["username"]}</small> <small>${time_before}</small>      
@@ -644,6 +651,12 @@ function get_posts_by_topic(topic) {
             let time_before2 = time2str(time_answer);
             console.log
             console.log(answer['username'],username)
+            let status_verified = '';
+            if(answer["status"] == 'verified'){
+              status_verified = `
+              <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             `
+            }
             let editAnswerHtml = '';
 
             if (answer['username'] === username) {
@@ -664,7 +677,8 @@ function get_posts_by_topic(topic) {
                       <div class="d-flex flex-column mx-2" style="width:fit-content;">
                         <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                               <p class="m-0 p-0">
-                                  <strong>${answer["profile_name"]}</strong>                 
+                                  <strong>${answer["profile_name"]}</strong>   
+                                  ${status_verified}             
                               </p>
                               <p class="m-0 p-0">
                               <small>@${answer["username"]}</small> <small>${time_before2}</small>      
@@ -764,6 +778,12 @@ function get_posts_by_topic(topic) {
               let time_answer = new Date(answer["date"]);
               let time_before2 = time2str(time_answer);
               console.log(answer['username'],username)
+              let status_verified = '';
+            if(answer["status"] == 'verified'){
+              status_verified = `
+              <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             `
+            }
               let editAnswerHtml = '';
 
               if (answer['username'] === username) {
@@ -784,7 +804,8 @@ function get_posts_by_topic(topic) {
                     <div class="d-flex flex-column mx-2" style="width:fit-content;">
                       <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                             <p class="m-0 p-0">
-                                <strong>${answer["profile_name"]}</strong>                 
+                                <strong>${answer["profile_name"]}</strong>
+                                ${status_verified}                 
                             </p>
                             <p class="m-0 p-0">
                             <small>@${answer["username"]}</small> <small>${time_before2}</small>      
@@ -906,6 +927,12 @@ function toggleReplyContainer(answerID) {
               let reply = replies[i];
               let time_reply = new Date(reply["date"]);
               let time_before2 = time2str(time_reply);
+              let status_verified = '';
+            if(reply["status"] == 'verified'){
+              status_verified = `
+              <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             `
+            }
               let editReplyHtml = ''
               if (reply['username'] === username) {
                 editReplyHtml = `<a class="dropdown-item" onclick="editReply('${reply['_id']}','${answerID}')"><span>Edit Reply</span></a>
@@ -922,7 +949,8 @@ function toggleReplyContainer(answerID) {
                           </a>
                           <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                               <p class="m-0 p-0">
-                                  <strong>${reply["profile_name"]}</strong> 
+                                  <strong>${reply["profile_name"]}</strong>
+                                   ${status_verified}
                                   <small>reply to @${userReplyTo}<small>                
                               </p>
                               <p class="m-0 p-0">
@@ -1013,6 +1041,12 @@ function toggleReplyContainer(answerID) {
               let answer = answers[i];
               let time_answer = new Date(answer["date"]);
               let count_replies = num2str(answer["count_replies"])
+              let status_verified = '';
+            if(answer["status"] == 'verified'){
+              status_verified = `
+              <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             `
+            }
               let editAnswerHtml = '';
 
               if (answer['username'] === username) {
@@ -1033,7 +1067,8 @@ function toggleReplyContainer(answerID) {
                     <div class="d-flex flex-column mx-2" style="width:fit-content;">
                       <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                             <p class="m-0 p-0">
-                                <strong>${answer["profile_name"]}</strong>                 
+                                <strong>${answer["profile_name"]}</strong>    
+                                ${status_verified}             
                             </p>
                             <p class="m-0 p-0">
                             <small>@${answer["username"]}</small> <small>${time_before2}</small>      

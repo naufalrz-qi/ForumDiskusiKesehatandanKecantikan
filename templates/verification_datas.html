@@ -1,0 +1,72 @@
+{% extends 'base_after.html' %}
+{% block head %}
+    <title>Report Datas</title>
+    <style>
+        th{
+           font-size: 12px;
+        }
+        td{
+           font-size: 12px;
+        }
+    </style>
+{% endblock %}
+{% block title %}
+<p class="has-text-weight-bold">Report Datas</p>
+    
+{% endblock %}
+{% block body %}
+<div class="w-100">
+    <div class="table-container">
+    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead class="thead">
+          <tr >
+            <th scope="col">No.</th>
+            <th scope="col">ID user</th>
+            <th scope="col">Username</th>
+            <th scope="col" style="white-space: nowrap;">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">ID Number</th>
+            <th scope="col">Workplace</th>
+            <th scope="col">Data</th>
+            <th scope="col">action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expertData in expertDatas %}
+          {% if expertData.user_status == 'unverified' %}
+            
+          
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ expertData.id_user }}</td>
+            <td>{{ expertData.username }}</td>
+            <td style="white-space: nowrap;">{{ expertData.name }}</td>
+            <td>{{ expertData.email }}</td>
+            <td>{{ expertData.phone_number }}</td>
+            <td>{{ expertData.id_number }}</td>
+            <td>{{ expertData.workplace }}</td>
+            <td><a class="button is-info" style="padding: 5px; border: 0px; height: fit-content;" href="../static/{{ expertData.file_data }}">Download</a></td>
+            <td class="d-flex"><a class="button is-primary" style="padding: 5px; border: 0px; height: fit-content;" onclick="verify_expert('{{ expertData._id }}','{{ expertData.id_user }}')">Verify</a>
+                <a class="button is-danger mx-1" style="padding: 5px; border: 0px; height: fit-content;" onclick="">Decline</a></td>
+          </tr>
+          {% endif %}
+          {% endfor %} 
+        </tbody>
+      </table>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block script %}
+    <script src="../static/js/expert_verify.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".sidebar2").addClass('is-hidden')
+            $('.content').addClass('me-0')
+        });
+
+
+    </script>
+{% endblock %}

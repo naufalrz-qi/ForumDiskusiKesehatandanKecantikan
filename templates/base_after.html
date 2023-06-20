@@ -85,7 +85,7 @@
                       Profile
                     </a>
                     {% if user_info.role == 'admin' %}
-                    <a class="dropdown-item" href="/verify_expert"><span>Verify Expert</span></a>
+                    <a class="dropdown-item" href="/verification_datas"><span>Verify Expert</span></a>
                     <a class="dropdown-item" href="/report_data"><span>Report Data</span></a>
                   {% endif %}
                     <hr class="dropdown-divider">
@@ -171,7 +171,7 @@
         <a class="buttonsidebar2 ps-5" href="/user/{{ user_info.username }}"><span>Profile</span></a>
        
         {% if user_info.role == 'admin' %}
-          <a class="buttonsidebar2 ps-5" href="/verify_expert"><span>Verify Expert</span></a>
+          <a class="buttonsidebar2 ps-5" href="/verification_datas"><span>Verify Expert</span></a>
           <a class="buttonsidebar2 ps-5" href="/report_data"><span>Report Data</span></a>
         {% endif %}
         <hr class="separator" style="margin: 0%;">

@@ -5,6 +5,8 @@ import jwt
 from datetime import datetime, timedelta
 import hashlib
 from werkzeug.utils import secure_filename
+import zipfile
+import os
 
 
 app = Flask(__name__)
@@ -217,6 +219,125 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
 
+@app.route('/expert_verification', methods=['POST'])
+def submit_data_expert():
+    name = request.form['name']
+    email = request.form['email']
+    phone_number = request.form['phone_number']
+    id_number = request.form['id_number']
+    workplace = request.form['workplace']
+    files = []
+    file1 = request.files['fileData1']
+    file2 = request.files['fileData2']
+    file3 = request.files['fileData3']
+    file4 = request.files['fileData4']
+    files.append(file1)
+    files.append(file2)
+    files.append(file3)
+    files.append(file4)
+    
+    print(files)
+    date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    file_names=[]
+    print(file_names)
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    return redirect(url_for('index',msg="You are an admin"))
+                else:            
+                    return redirect(url_for('index',msg="You are not an expert"))
+            elif user_info2:
+                check_data = db.expert_datas.find_one({'id_user':str(user_info2['_id'])})
+                if check_data:
+                    return redirect(url_for('expert_verification',msg="You already submitted your data, please wait until we done review it"))
+                else:
+                    a = 0
+                    for file in files:
+                        if file:
+                            a += 1
+                            filename = f"{a}_{file.filename}"
+                            file.save('./static/expert_files/' + filename)
+                            file_names.append(filename)
+
+                    
+                    if file_names:
+                        zip_file = 'expert_files/'+user_info2['username']+'_'+date+'.zip'
+                        zip_filename = './static/' + zip_file
+                        with zipfile.ZipFile(zip_filename, 'w') as zip:
+                            for filename in file_names:
+                                zip.write('./static/expert_files/' + filename, filename)
+                                
+                            for filename in file_names:
+                                os.remove('./static/expert_files/' + filename)
+                        
+                        
+                        document = {
+                            'id_user': str(user_info2['_id']),
+                            'name': name,
+                            'email': email,
+                            'phone_number': phone_number,
+                            'id_number': id_number,
+                            'workplace': workplace,
+                            'file_data': zip_file
+                        }
+                        db.expert_datas.insert_one(document)
+                        return redirect(url_for('expert_verification',msg="Your data have been submitted"))
+                    
+                    else:
+                        return redirect(url_for('expert_verification',msg="Please upload your files"))
+            
+                    
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/expert_verification')
+def expert_verification():
+    msg = request.args.get('msg')
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    return render_template('forum_after.html',user_info=user_info, msg="You are an admin")
+                else:            
+                    return render_template('forum_after.html',user_info=user_info, msg="You are not an expert")
+            elif user_info2:
+                return render_template('expert_verification.html',user_info=user_info2,msg=msg)
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('index'))
+    
 @app.route('/create_post')
 def create_post():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -326,6 +447,90 @@ def delete_post(id_post):
             return redirect(url_for('login', msg=msg))
     else:
         return redirect(url_for('login'))
+    
+@app.route('/verification_datas')
+def verification_datas():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    expertDatas = list(db.expert_datas.find({}))
+                    list_expertDatas = []
+                    for expertData in expertDatas:
+                        user = db.expert_users.find_one({'_id':ObjectId(str(expertData['id_user']))})
+                        doc = {
+                            '_id':str(expertData['_id']),
+                            'id_user':expertData['id_user'],
+                            'name':expertData['name'],
+                            'email':expertData['email'],
+                            'phone_number':expertData['phone_number'],
+                            'id_number':expertData['id_number'],
+                            'workplace':expertData['workplace'],
+                            'file_data':expertData['file_data'],
+                            'username':user['username'],
+                            'user_status':user['status']
+                            
+                        }
+                        list_expertDatas.append(doc)
+                    return render_template('verification_datas.html',user_info=user_info,expertDatas=list_expertDatas)
+                else: 
+                    return redirect(url_for('index'))
+            elif user_info2:
+                return redirect(url_for('index'))
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/verifying', methods=['POST'])
+def verifying():
+    user_id = request.form['user_id']
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    user = db.expert_users.find_one({'_id':ObjectId(user_id)})
+                    db.expert_users.update_one({'_id':ObjectId(user_id)},{'$set':{'status':'verified'}})
+                    return jsonify({
+                        'result':'success',
+                        'msg':'User '+user['username']+' has been verified'
+                    })
+                else: 
+                    return redirect(url_for('index'))
+            elif user_info2:
+                return redirect(url_for('index'))
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('index'))
     
 @app.route('/report_data')
 def report_data():
@@ -1238,6 +1443,7 @@ def get_replies():
                     'reply':reply['reply'],
                     'date':reply['date'],
                     'count_replies':count_replies,
+                    'status': '',
                 }
                 
             if user2:
@@ -1250,6 +1456,8 @@ def get_replies():
                     'reply':reply['reply'],
                     'date':reply['date'],
                     'count_replies':count_replies,
+                    'status': user2['status'],
+                    
                     
                 }
             list_replies.append(doc)
@@ -1294,6 +1502,8 @@ def get_answers():
                     'answer_pic_real':answer['answer_pic_real'],
                     'answer_pic':answer['answer_pic'],
                     'count_replies':count_replies,
+                    'status':'',
+                    
                 }
                 
             if user2:
@@ -1308,6 +1518,8 @@ def get_answers():
                     'answer_pic_real':answer['answer_pic_real'],
                     'answer_pic':answer['answer_pic'],
                     'count_replies':count_replies,
+                    'status': user2['status'],
+                    
                     
                 }
             list_answers.append(doc)
@@ -1414,7 +1626,8 @@ def post_detail(id_post):
                     'topic':post['topic'],
                     'date':post['date'],
                     'post_pic_real':post['post_pic_real'],
-                    'post_pic':post['post_pic']
+                    'post_pic':post['post_pic'],
+                    'status':''
                 }
                 doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
                 if user_info:
@@ -1436,7 +1649,9 @@ def post_detail(id_post):
                     'topic':post['topic'],
                     'date':post['date'],
                     'post_pic_real':post['post_pic_real'],
-                    'post_pic':post['post_pic']
+                    'post_pic':post['post_pic'],
+                    'status': user2['status'],
+
                 }
                 doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
                 if user_info:
@@ -1695,6 +1910,7 @@ def get_posts_by_topic(topic):
                     'profile_name': user1['profile_name'],
                     'profile_pic_real': user1['profile_pic_real'],
                     'role': user1['role'],
+                    'status': '',
                     'title': post['title'],
                     'question': post['question'],
                     'topic': post['topic'],
@@ -1717,6 +1933,7 @@ def get_posts_by_topic(topic):
                     'profile_name': user2['profile_name'],
                     'profile_pic_real': user2['profile_pic_real'],
                     'role': user2['role'],
+                    'status': user2['status'],
                     'title': post['title'],
                     'question': post['question'],
                     'topic': post['topic'],
@@ -1773,6 +1990,7 @@ def get_posts():
                     'profile_name':user1['profile_name'],
                     'profile_pic_real':user1['profile_pic_real'],
                     'role':user1['role'],
+                    'status': '',
                     'title':post['title'],
                     'question':post['question'],
                     'topic':post['topic'],
@@ -1796,6 +2014,7 @@ def get_posts():
                     'profile_name':user2['profile_name'],
                     'profile_pic_real':user2['profile_pic_real'],
                     'role':user2['role'],
+                    'status': user2['status'],
                     'title':post['title'],
                     'question':post['question'],
                     'topic':post['topic'],

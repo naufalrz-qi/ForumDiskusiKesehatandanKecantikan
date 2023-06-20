@@ -35,7 +35,12 @@
                 </a>
                 <div class="d-flex flex-column mx-2">
                     <p class="m-0 p-0">
-                        <strong>{{ post.profile_name }}</strong>                 
+                        <strong>{{ post.profile_name }}</strong>
+                        {% if post.status == 'verified' %}
+                      
+                          <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+             
+                        {% endif %}                 
                     </p>
                     <p class="m-0 p-0">
                     <small>{{ post.username }}</small> <small id="time_before"></small>      

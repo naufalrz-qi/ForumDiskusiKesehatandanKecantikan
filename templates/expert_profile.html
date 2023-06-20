@@ -18,7 +18,13 @@
             
 
             <div class="d-flex flex-column my-5">
-                <p class="h3 has-text-weight-bold m-0"> {{ user_data.profile_name }}</p>
+                <p class="h3 has-text-weight-bold m-0"> {{ user_data.profile_name }}
+
+                    {% if user_data.status == 'verified' %}
+                    <span class="button is-primary is-static text-white" style="background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
+                    {% endif %}
+
+                </p>
                 <small class="has-text-weight-light text-body-tertiary"> @{{ user_data.username }}</small>
             </div>
             
@@ -54,7 +60,7 @@
             {% if status %}
             
 
-            <nav id="btns-me" class="level is-mobile">
+            <div id="btns-me" class="d-flex justify-content-start">
                 <a
                     class="button has-text-centered is-primary"
                     aria-label="edit"
@@ -220,8 +226,18 @@
                         aria-label="close"
                         onclick='$("#modal-edit").removeClass("is-active")'
                     ></button>
-                    </div>
-            </nav>
+                </div>
+                {% if user_data.status == 'verified' %}
+            
+                <a class="button has-text-centered is-primary is-outlined mx-3 is-static">
+                    verified
+                </a>
+                {% else %}
+                <a class="button has-text-centered is-primary is-outlined mx-3 is-static">
+                    verified
+                </a>
+                {% endif %}
+            </div>
             {% endif %}
         </div>
       

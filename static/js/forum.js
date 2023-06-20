@@ -113,6 +113,7 @@ function answer(id_post) {
         }
     })
 }
+
 function editing_answer(id_post,text,answerID) {
     let input_answer = text
     let file = ''
@@ -269,7 +270,7 @@ function get_posts(username) {
                 <div class="dropdown-content">
                   ${editPostHtml}
                   <a class="dropdown-item" href="/post_detail/${post['_id']}"><span>View Detail</span></a>
-                  <a class="dropdown-item" href="#" onclick="showReportModal('${post['_id']}')"><span>Report</span></a>
+                  <a class="dropdown-item" href="#" onclick="showReportModal()"><span>Report</span></a>
                 </div>
               </div>
             </div>
@@ -604,9 +605,14 @@ function get_posts_by_topic(topic) {
     });
   }
   
-  function showReportModal(postId) {
+  function showReportModal() {
     // Dapatkan modal element menggunakan ID
     let modal = $("#reportModal");
+    modal.addClass("is-active");
+  }
+  function showReportModalAnswer() {
+    // Dapatkan modal element menggunakan ID
+    let modal = $("#reportModalAnswer");
     modal.addClass("is-active");
   }
 
@@ -643,7 +649,7 @@ function get_posts_by_topic(topic) {
             let answer_temp =
                 `
           
-                <div class="w-100 px-lg-3 p-sm-1">
+                <div id="answer_${answer['_id']}" class="w-100 px-lg-3 p-sm-1">
                 <div>
                     <div class="d-flex flex-row mb-4">
                         <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
@@ -679,7 +685,7 @@ function get_posts_by_topic(topic) {
                           <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
                             <div class="dropdown-content">
                               ${editAnswerHtml}
-                              <a class="dropdown-item" onclick="showReportAnswer('${answer["_id"]}')"><span>Report</span></a>
+                              <a class="dropdown-item" onclick="showReportModalAnswer()"><span>Report</span></a>
                             </div>
                           </div>
                         </div>
@@ -693,6 +699,47 @@ function get_posts_by_topic(topic) {
 
                     </div>
                 
+                </div>
+                <!-- Modal Report -->
+                <div id="reportModalAnswer" class="modal">
+                  <div class="modal-background"></div>
+                  <div class="modal-card">
+                    <header class="modal-card-head">
+                      <p class="modal-card-title">Report Answer</p>
+                      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+                    </header>
+                    <section class="modal-card-body">
+                      <div class="field">
+                        <label class="label" for="issueType">Type of Issue</label>
+                        <div class="control">
+                          <div class="select">
+                            <select id="issueType">
+                              <option value="Technical Error" selected>Technical Error</option>
+                              <option value="Unclear Answer">Unclear Answer</option>
+                              <option value="Rule Violation">Rule Violation</option>
+                              <option value="Irrelevant Content">Irrelevant Content</option>
+                              <option value="Discrimination or Harassment">Discrimination or Harassment</option>
+                              <option value="Spam">Spam</option>
+                              <option value="Inaccurate Information">Inaccurate Information</option>
+                              <option value="Repeated Answer">Repeated Answer</option>
+                              <option value="Inappropriateness">Inappropriateness</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label" for="issueDescription">Description</label>
+                        <div class="control">
+                          <textarea class="textarea" id="issueDescription"></textarea>
+                        </div>
+                      </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                      <button class="button is-primary" onclick="submitReportAnswer('${postID}','${answer['_id']}')">Submit</button>
+                      <button class="button" onclick="closeModal()">Cancel</button>
+                    </footer>
+                  </div>
                 </div>
                  
                 `
@@ -722,7 +769,7 @@ function get_posts_by_topic(topic) {
               let answer_temp =
               `
           
-              <div class="w-100 px-lg-3 p-sm-1">
+              <div id="answer_${answer['_id']}" class="w-100 px-lg-3 p-sm-1">
               <div>
                   <div class="d-flex flex-row mb-4">
                       <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
@@ -757,7 +804,7 @@ function get_posts_by_topic(topic) {
                         <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
                           <div class="dropdown-content">
                             ${editAnswerHtml}
-                            <a class="dropdown-item" onclick="showReportAnswer('${answer["_id"]}')"><span>Report</span></a>
+                            <a class="dropdown-item" onclick="showReportModalAnswer()"><span>Report</span></a>
                           </div>
                         </div>
                       </div>
@@ -774,7 +821,47 @@ function get_posts_by_topic(topic) {
                   </div>
               
               </div>
-               
+              <!-- Modal Report -->
+              <div id="reportModalAnswer" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Report Answer</p>
+                    <button class="delete" aria-label="close" onclick="closeModal()"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <div class="field">
+                      <label class="label" for="issueType">Type of Issue</label>
+                      <div class="control">
+                        <div class="select">
+                          <select id="issueType">
+                            <option value="Technical Error" selected>Technical Error</option>
+                            <option value="Unclear Answer">Unclear Answer</option>
+                            <option value="Rule Violation">Rule Violation</option>
+                            <option value="Irrelevant Content">Irrelevant Content</option>
+                            <option value="Discrimination or Harassment">Discrimination or Harassment</option>
+                            <option value="Spam">Spam</option>
+                            <option value="Inaccurate Information">Inaccurate Information</option>
+                            <option value="Repeated Answer">Repeated Answer</option>
+                            <option value="Inappropriateness">Inappropriateness</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label class="label" for="issueDescription">Description</label>
+                      <div class="control">
+                        <textarea class="textarea" id="issueDescription"></textarea>
+                      </div>
+                    </div>
+                  </section>
+                  <footer class="modal-card-foot">
+                    <button class="button is-primary" onclick="submitReportAnswer('${postID}','${answer['_id']}')">Submit</button>
+                    <button class="button" onclick="closeModal()">Cancel</button>
+                  </footer>
+                </div>
+              </div>
               `
 
             $(`#answer-${postID}`).append(answer_temp);
@@ -879,6 +966,7 @@ function toggleReplyContainer(answerID) {
     url:'/get_answers',
     data:{'id_post':postID},
     success:function(response){
+      const username = $('script[data-username]').data('username');
       if (response["result"] === "success") {
         let answers = response["answers"];
         
@@ -890,44 +978,109 @@ function toggleReplyContainer(answerID) {
               let answer = answers[i];
               let time_answer = new Date(answer["date"]);
               let count_replies = num2str(answer["count_replies"])
+              let editAnswerHtml = '';
+
+              if (answer['username'] === username) {
+                editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
+                                <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
+                `;
+                }
               let time_before2 = time2str(time_answer);
               let answer_temp =
                   `
-                  <div class="w-100 px-lg-3 p-sm-1">
-                  <div>
-                      <div class="d-flex flex-row mb-4">
-                          <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
-                              <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
-                                  alt="Image">
-                          </a>
-                          <div class="d-flex flex-column mx-2  w-100">
-                          <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
-                                <p class="m-0 p-0">
-                                    <strong>${answer["profile_name"]}</strong>                 
-                                </p>
-                                <p class="m-0 p-0">
-                                <small>@${answer["username"]}</small> <small>${time_before2}</small>      
-                                </p>
-                              
-                                <p id="${answer['answer']}">${answer['answer']}</p>
-                                
-  
-                          </div>
-                          <a class="reply-link mx-3" id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
-                              <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
-                                
-                                <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
-                                  <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
-                                  <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
-                                </div>
+                  <div id="answer_${answer['_id']}" class="w-100 px-lg-3 p-sm-1">
+              <div>
+                  <div class="d-flex flex-row mb-4">
+                      <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
+                          <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
+                              alt="Image">
+                      </a>
+                    <div class="d-flex flex-column mx-2" style="width:fit-content;">
+                      <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
+                            <p class="m-0 p-0">
+                                <strong>${answer["profile_name"]}</strong>                 
+                            </p>
+                            <p class="m-0 p-0">
+                            <small>@${answer["username"]}</small> <small>${time_before2}</small>      
+                            </p>
+                          
+                            <p id="${answer['_id']}">${answer['answer']}</p>
 
-                                <div id="replies_${answer["_id"]}">
-                                </div>
-                              </div>
+                            
+
+                      </div>
+                      <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
+                          <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
+                            
+                            <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                              <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                              <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
+                            </div>
                           </div>
                       </div>
-                  
+                      <div class="d-flex justify-content-center align-content-center align-items-center" style="height: 87px;">
+                        <a class="bi bi-three-dots " id="answer_drop_toggle_${answer["_id"]}" aria-controls="answer_drop_${answer["_id"]}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px; color: inherit; "></a>
+                        <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
+                          <div class="dropdown-content">
+                            ${editAnswerHtml}
+                            <a class="dropdown-item" onclick="showReportModalAnswer()"><span>Report</span></a>
+                          </div>
+                        </div>
+                      </div>
+                     
+
+
+
+                      
+
+
+
+
+
                   </div>
+              
+              </div>
+              <!-- Modal Report -->
+              <div id="reportModalAnswer" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Report Answer</p>
+                    <button class="delete" aria-label="close" onclick="closeModal()"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <div class="field">
+                      <label class="label" for="issueType">Type of Issue</label>
+                      <div class="control">
+                        <div class="select">
+                          <select id="issueType">
+                            <option value="Technical Error" selected>Technical Error</option>
+                            <option value="Unclear Answer">Unclear Answer</option>
+                            <option value="Rule Violation">Rule Violation</option>
+                            <option value="Irrelevant Content">Irrelevant Content</option>
+                            <option value="Discrimination or Harassment">Discrimination or Harassment</option>
+                            <option value="Spam">Spam</option>
+                            <option value="Inaccurate Information">Inaccurate Information</option>
+                            <option value="Repeated Answer">Repeated Answer</option>
+                            <option value="Inappropriateness">Inappropriateness</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label class="label" for="issueDescription">Description</label>
+                      <div class="control">
+                        <textarea class="textarea" id="issueDescription"></textarea>
+                      </div>
+                    </div>
+                  </section>
+                  <footer class="modal-card-foot">
+                    <button class="button is-primary" onclick="submitReportAnswer('${postID}','${answer['_id']}')">Submit</button>
+                    <button class="button" onclick="closeModal()">Cancel</button>
+                  </footer>
+                </div>
+              </div>
                   `
 
             getReplies_detail(answer["_id"],answer["username"])
@@ -988,6 +1141,59 @@ function editAnswer(answerId,postID) {
         answer += paragraph[i]+"<br>";
       }
       answerElement.empty().html(answer);
+    }
+  });
+}
+
+function confirmDeleteAnswer(answerId) {
+  let confirmation = confirm("Apakah Anda yakin ingin menghapus jawaban ini?");
+
+  if (confirmation) {
+    $("#answer_" + answerId).remove();
+    $.ajax({
+      type: "POST",
+      url: "/delete_answer",
+      data:{'id_answer':answerId},
+      success: function (response) {
+          if (response["result"] === "success") {
+              alert(response["msg"]);
+            }
+          else if(response["result"] === 'failed'){
+            alert(response['msg'])
+          }
+          
+      }
+  })
+    
+  }
+}
+
+
+function submitReportAnswer(id_post,answerID) {
+  // Get the values from the input fields
+  let issueType = $("#issueType").val();
+  let description = $("#issueDescription").val();
+  
+  // Perform validation, e.g., check if the fields are empty
+  
+  // Create an object to store the report data
+  let reportData = {
+    id_post:id_post,
+    id_user:answerID,
+    issueType: issueType,
+    description: description
+  };
+  
+  // Perform an AJAX request to submit the report data to the server
+  $.ajax({
+    url: "/submit_report_answer",
+    type: "POST",
+    data: reportData,
+    success: function(response) {
+      // Handle the success response from the server
+      alert(response['msg'])
+      // Close the modal
+      closeModal();
     }
   });
 }

@@ -188,7 +188,7 @@
 {% endblock %}
 
 {% block script %}
-    <script src="../static/js/forum.js"></script>
+    <script src="../static/js/forum.js" data-username="{{ user_info.username }}"></script>
     <script>
         $(document).ready(function () {
             time_before()

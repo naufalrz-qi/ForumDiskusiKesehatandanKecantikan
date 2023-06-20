@@ -441,6 +441,63 @@ def submit_report():
     else:
         return redirect(url_for('login'))
    
+@app.route('/submit_report_answer', methods=['POST'])
+def submit_report_answer():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            id_post = request.form.get('id_post')
+            id_user = request.form.get('id_user')
+            issue_type = request.form.get('issueType')
+            description = request.form.get('description')
+            
+            # Create a new report document
+           
+            
+            if user_info:
+                report = {
+                    'by_user':str(user_info['_id']),
+                    'link':'/post_detail/'+id_post+'#answer_'+id_user,
+                    'username':user_info['username'],
+                    'id_post':id_post,
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            elif user_info2:
+                report = {
+                    'by_user':str(user_info2['_id']),
+                    'link':'/post_detail/'+id_post+'/#answer_'+id_user,
+                    'username':user_info2['username'],
+                    'id_post':id_post,
+                    'issue_type': issue_type,
+                    'description': description
+                }
+                db.reports.insert_one(report)
+                return jsonify({
+                    "msg":"Your report has been submitted. We will review it as soon as possible."
+                })
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('login', msg=msg))
+    else:
+        return redirect(url_for('login'))
+   
     
 @app.route('/register')
 def register():
@@ -939,6 +996,53 @@ def edit_answer():
         return redirect(url_for("index"))
     
     
+@app.route("/delete_answer", methods=["POST"])
+def delete_answer():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY, 
+            algorithms=["HS256"]
+            )
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+        
+
+        id_answer = request.form["id_answer"]
+        
+        if user_info:
+            if user_info['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:
+
+                db.answers.delete_one({"_id": ObjectId(id_answer)})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successfully deleted!"
+                    })
+        
+            
+        elif user_info2:
+            if user_info2['role'] == 'admin':
+                return jsonify({
+                    "result": "failed",
+                    "msg": "You're an admin"
+                })
+            else:               
+                db.answers.delete_one({"_id": ObjectId(id_answer)})
+                return jsonify({
+                    "result": "success",
+                    "msg": "Answering successfully deleted!"
+                    })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
+    
 @app.route("/get_replies", methods=["POST"])
 def get_replies():
     id_answer_receive = request.form['id_answer']
@@ -1107,6 +1211,11 @@ def submit_reply():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
     
+@app.route("/post_detail/<id_post>/")
+def post_detail_slash(id_post):
+    # Mengarahkan permintaan ke versi URL tanpa slash
+    return redirect(url_for('post_detail', id_post=id_post))
+
 @app.route("/post_detail/<id_post>")
 def post_detail(id_post):
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -1188,7 +1297,7 @@ def post_detail(id_post):
             msg='There was a problem logging you in'
             return redirect(url_for('login', msg=msg))
     else:
-        return render_template('index.html')
+        return redirect(url_for(index))
 
         
 @app.route("/posting", methods=["POST"])

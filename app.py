@@ -774,7 +774,7 @@ def answering():
         user_info = db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = db.expert_users.find_one({'username':payload.get('id')})
         
-        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        
          
         answer_receive = request.form["answer_give"]
         id_post = request.form["id_post"]
@@ -850,6 +850,60 @@ def answering():
         return redirect(url_for("index"))
     
     
+@app.route("/get_replies", methods=["POST"])
+def get_replies():
+    id_answer_receive = request.form['id_answer']
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        list_replies = []
+
+        replies = list(db.replies.find({'answer_id':id_answer_receive}).sort("date", -1))
+    
+        for reply in replies:
+            user1 = db.normal_users.find_one({'_id':ObjectId(reply['id_user'])})
+            user2 = db.expert_users.find_one({'_id':ObjectId(reply['id_user'])})
+            count_replies = db.replies.count_documents({"answer_id": str(reply['_id'])})
+            if user1:
+                doc = {
+                    '_id':str(reply['_id']),
+                    'username':user1['username'],
+                    'profile_name':user1['profile_name'],
+                    'profile_pic_real':user1['profile_pic_real'],
+                    'role':user1['role'],
+                    'reply':reply['reply'],
+                    'date':reply['date'],
+                    'count_replies':count_replies,
+                }
+                
+            if user2:
+                doc = {
+                    '_id':str(reply['_id']),
+                    'username':user2['username'],
+                    'profile_name':user2['profile_name'],
+                    'profile_pic_real':user2['profile_pic_real'],
+                    'role':user2['role'],
+                    'reply':reply['reply'],
+                    'date':reply['date'],
+                    'count_replies':count_replies,
+                    
+                }
+            list_replies.append(doc)
+        
+        
+        return jsonify({
+            "result": "success",
+            "msg": "Successful fetched all replies",
+            'replies':list_replies
+            })
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
+    
 @app.route("/get_answers", methods=["POST"])
 def get_answers():
     id_post_receive = request.form['id_post']
@@ -867,7 +921,7 @@ def get_answers():
         for answer in answers:
             user1 = db.normal_users.find_one({'_id':ObjectId(answer['id_user'])})
             user2 = db.expert_users.find_one({'_id':ObjectId(answer['id_user'])})
-            
+            count_replies = db.replies.count_documents({"answer_id": str(answer['_id'])})
             if user1:
                 doc = {
                     '_id':str(answer['_id']),
@@ -878,7 +932,8 @@ def get_answers():
                     'answer':answer['answer'],
                     'date':answer['date'],
                     'answer_pic_real':answer['answer_pic_real'],
-                    'answer_pic':answer['answer_pic']
+                    'answer_pic':answer['answer_pic'],
+                    'count_replies':count_replies,
                 }
                 
             if user2:
@@ -891,7 +946,9 @@ def get_answers():
                     'answer':answer['answer'],
                     'date':answer['date'],
                     'answer_pic_real':answer['answer_pic_real'],
-                    'answer_pic':answer['answer_pic']
+                    'answer_pic':answer['answer_pic'],
+                    'count_replies':count_replies,
+                    
                 }
             list_answers.append(doc)
         
@@ -905,7 +962,61 @@ def get_answers():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
 
-    
+@app.route("/submit_reply", methods=["POST"])
+def submit_reply():
+    post_id = request.form['post_id']
+    answer_id = request.form['answer_id']
+    date = request.form['date']
+    reply = request.form['reply']
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        
+        username = payload.get('id')
+        user_info = db.normal_users.find_one({'username':payload.get('id')})
+        user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+      
+        if user_info:
+            if user_info['role'] != 'admin':
+                db.replies.insert_one({
+                    'id_user': str(user_info['_id']),
+                    'post_id': post_id,
+                    'answer_id': answer_id,
+                    'reply': reply,
+                    'date': date,
+                })
+                
+                count_replies = db.replies.count_documents({"answer_id": answer_id})
+                
+                return jsonify({
+                    "result": "success",
+                    "msg": "Reply berhasil dikirim",
+                    'count_replies':count_replies
+                })
+        elif user_info2:
+            db.replies.insert_one({
+                'id_user': str(user_info2['_id']),
+                'post_id': post_id,
+                'answer_id': answer_id,
+                'reply': reply,
+                'date': date,
+                
+            })
+            
+            count_replies = db.replies.count_documents({"answer_id": answer_id})
+            
+            return jsonify({
+                "result": "success",
+                "msg": "Reply berhasil dikirim",
+                'count_replies':count_replies
+                
+            })
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
     
 @app.route("/post_detail/<id_post>")
 def post_detail(id_post):
@@ -1003,8 +1114,7 @@ def posting():
         username = payload.get('id')
         user_info = db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = db.expert_users.find_one({'username':payload.get('id')})
-        
-        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
          
         title_receive = request.form["title_give"]
         question_receive = request.form["question_give"]
@@ -1084,7 +1194,7 @@ def post_editing():
         username = payload.get('id')
         user_info = db.normal_users.find_one({'username':username})
         user_info2 = db.expert_users.find_one({'username':username})
-        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+     
                 
         title_receive = request.form["title_give"]
         question_receive = request.form["question_give"]
@@ -1338,7 +1448,6 @@ def get_posts():
 
             list_posts.append(doc)
             
-        
         return jsonify({
             "result": "success",
             "msg": "Successful fetched all posts",

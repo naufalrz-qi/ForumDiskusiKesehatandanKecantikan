@@ -120,3 +120,26 @@
     border: none;
     color: white;
   }
+
+  .reply-input:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.reply-submit:hover {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: rgb(174, 255, 197) !important;
+}
+.reply-submit:focus {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: rgb(174, 255, 197) !important;
+}

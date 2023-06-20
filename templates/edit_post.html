@@ -89,12 +89,15 @@
           $("#popular-posts").empty()
           $("#must-read").empty()
           get_posts2()
-          $('#select_topic').val('{{ post.topic }}')
+          
           let questionText = "{{ post.question|safe }}"
           console.log(questionText)
           questionText = questionText.replace(/<br>/g, '\n');
           console.log(questionText)
           $('#input_question').val(questionText);
+          $("#select_topic").empty()
+          get_topics('{{ post.topic }}')
+          
       });
   </script>
 {% endblock %}

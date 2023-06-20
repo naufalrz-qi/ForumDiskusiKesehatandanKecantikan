@@ -129,7 +129,7 @@ function answer(id_post) {
             let post = posts[i];
             let html_temp = `
     
-            <li><a href="/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
+            <li><a href="/post_detail/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
 
 
             
@@ -140,7 +140,7 @@ function answer(id_post) {
             let post = posts[i];
             let html_temp2 = `
     
-            <li><a href="/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
+            <li><a href="/post_detail/${post['_id']}" class="h6 has-text-link" style="font-size: 14px; ">${post['title']}</a></li>
 
 
             
@@ -271,7 +271,7 @@ function get_posts(username) {
             <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <div class="d-flex justify-content-end px-5">
               <a id="up_${post['_id']}" onclick="toggle_up('${post["_id"]}', 'up')" class="bi bi-arrow-up has-text-weight-bold me-3 ${class_up}" style="font-size:16px;">
-                <span class="up-num">${num2str(post["count_up"])}</span>
+                <span class="up-num" style="font-size:16px;">${num2str(post["count_up"])}</span>
               </a>
               <a id="answer_count_${post['_id']}" class="bi bi-chat-left has-text-weight-bold text-body-tertiary" style="font-size:16px;"></a>
             </div>
@@ -421,7 +421,8 @@ function get_posts(username) {
   }
 
   function num2str(count_number) {
-    let count = parseInt(count_number)
+    if(count_number!=''){
+      let count = parseInt(count_number)
     if (count > 10000) {
         return parseInt(count / 1000) + "k"
     }
@@ -432,9 +433,14 @@ function get_posts(username) {
         return ""
     }
     return count
+    }else{
+      let count = 0
+      return count
+    }
+    
 }
 
-function get_topics() {
+function get_topics(value) {
   $.ajax({
     type: "GET",
     url: "/get_topics",
@@ -454,6 +460,10 @@ function get_topics() {
 
           selectElement.append(categoryGroup);
         }
+        if(topics.length === topics.length){
+          $('#select_topic').val(value)
+        }
+        
         
       }
     }
@@ -566,22 +576,38 @@ function get_posts_by_topic(topic) {
   }
 
   function getAnswer(postID) {
+    
     $.ajax({
     type:"POST",
     url:'/get_answers',
     data:{'id_post':postID},
     success:function(response){
+      const username = $('script[data-username]').data('username');
+     
+    
       if (response["result"] === "success") {
         let answers = response["answers"];
-        let count = answers.length
-        let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
+        console.log(answers)
+        let reply_counting = 0
         if(answers.length>0 & answers.length<3){
         for (let i = 0; i < 2; i++) {
             let answer = answers[i];
+            let count_replies = num2str(answer["count_replies"])
+            console.log(count_replies)
             let time_answer = new Date(answer["date"]);
             let time_before2 = time2str(time_answer);
+            console.log
+            console.log(answer['username'],username)
+            let editAnswerHtml = '';
+
+            if (answer['username'] === username) {
+              editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}')"><span>Edit Answer</span></a>
+                              <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
+              `;
+              }
             let answer_temp =
                 `
+          
                 <div class="w-100 px-lg-3 p-sm-1">
                 <div>
                     <div class="d-flex flex-row mb-4">
@@ -589,7 +615,86 @@ function get_posts_by_topic(topic) {
                             <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
                                 alt="Image">
                         </a>
-                        <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
+                      <div class="d-flex flex-column mx-2" style="width:fit-content;">
+                        <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
+                              <p class="m-0 p-0">
+                                  <strong>${answer["profile_name"]}</strong>                 
+                              </p>
+                              <p class="m-0 p-0">
+                              <small>@${answer["username"]}</small> <small>${time_before2}</small>      
+                              </p>
+                            
+                              <p>${answer['answer']}</p>
+                              
+
+                        </div>
+                        <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
+                            <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
+                              
+                              <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                                <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                                <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
+                              </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center align-content-center align-items-center" style="height: 87px;">
+                          <a class="bi bi-three-dots " id="answer_drop_toggle_${answer["_id"]}" aria-controls="answer_drop_${answer["_id"]}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px; color: inherit; "></a>
+                          <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
+                            <div class="dropdown-content">
+                              ${editAnswerHtml}
+                              <a class="dropdown-item" onclick="showReportAnswer('${answer["_id"]}')"><span>Report</span></a>
+                            </div>
+                          </div>
+                        </div>
+                       
+
+                          
+
+
+
+
+
+                    </div>
+                
+                </div>
+                 
+                `
+            $(`#answer-${postID}`).append(answer_temp);
+            reply_counting += parseInt(count_replies)
+
+          }
+          let count = answers.length+reply_counting
+          let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
+          $(`#answer_count_${postID}`).empty()
+          $(`#answer_count_${postID}`).append(answer_count);
+        }
+        else if(answers.length>=3){
+          for (let i = 0; i < 3; i++) {
+              let answer = answers[i];
+              let count_replies = num2str(answer["count_replies"])
+              let time_answer = new Date(answer["date"]);
+              let time_before2 = time2str(time_answer);
+              console.log(answer['username'],username)
+              let editAnswerHtml = '';
+
+              if (answer['username'] === username) {
+                editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}')"><span>Edit Answer</span></a>
+                                <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
+                `;
+                }
+              let answer_temp =
+              `
+          
+              <div class="w-100 px-lg-3 p-sm-1">
+              <div>
+                  <div class="d-flex flex-row mb-4">
+                      <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
+                          <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
+                              alt="Image">
+                      </a>
+                    <div class="d-flex flex-column mx-2" style="width:fit-content;">
+                      <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                             <p class="m-0 p-0">
                                 <strong>${answer["profile_name"]}</strong>                 
                             </p>
@@ -598,53 +703,131 @@ function get_posts_by_topic(topic) {
                             </p>
                           
                             <p>${answer['answer']}</p>
-                          
+                            
+
+                      </div>
+                      <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
+                          <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
+                            
+                            <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                              <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                              <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
+                            </div>
+                          </div>
+                      </div>
+                      <div class="d-flex justify-content-center align-content-center align-items-center" style="height: 87px;">
+                        <a class="bi bi-three-dots " id="answer_drop_toggle_${answer["_id"]}" aria-controls="answer_drop_${answer["_id"]}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px; color: inherit; "></a>
+                        <div class="dropdown-menu" id="answer_drop_${answer["_id"]}" aria-labelledby="answer_drop_toggle_${answer["_id"]}">
+                          <div class="dropdown-content">
+                            ${editAnswerHtml}
+                            <a class="dropdown-item" onclick="showReportAnswer('${answer["_id"]}')"><span>Report</span></a>
+                          </div>
                         </div>
-                    </div>
-                
-                </div> 
-                `
+                      </div>
+                     
+
+
+
+                      
+
+
+
+
+
+                  </div>
+              
+              </div>
+               
+              `
+
             $(`#answer-${postID}`).append(answer_temp);
-            $(`#answer_count_${postID}`).empty()
-            $(`#answer_count_${postID}`).append(answer_count);
-
+            reply_counting += parseInt(count_replies)
+                
+            }
+          let count = answers.length+reply_counting
+          let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
+          $(`#answer_count_${postID}`).empty()
+          $(`#answer_count_${postID}`).append(answer_count);
           }
-          
+      }
+    }
 
-        }
-        else if(answers.length>=3){
-          for (let i = 0; i < 3; i++) {
-              let answer = answers[i];
-              let time_answer = new Date(answer["date"]);
-              let time_before2 = time2str(time_answer);
-              let answer_temp =
+  })  
+}
+
+function sendReply(answerId, postID, userReplyTo) {
+  
+  let replyText = $('#input-reply-'+answerId).val();
+  let date = new Date().toISOString()
+  console.log(replyText)
+  $.ajax({
+    type: "POST",
+    url: "/submit_reply",
+    data: {
+      post_id: postID,
+      answer_id: answerId,
+      reply: replyText,
+      date:date
+    },
+    success: function(response) {
+      if (response.result === "success") {
+        alert("Your reply has been sended");
+        $(`#reply_toggle_`+answerId).text('reply('+num2str(response["count_replies"])+')');
+        getReplies_detail(answerId,userReplyTo)
+        toggleReplyContainer(answerId)
+      }
+    },
+  });
+}
+
+
+function toggleReplyContainer(answerID) {
+  $(`#reply_${answerID} input.reply-input`).val('');
+  $(`#reply_${answerID}`).toggle();
+}
+
+  function getReplies_detail(answerID,userReplyTo) {
+    $('#replies_'+answerID).empty();
+    $.ajax({
+    type:"POST",
+    url:'/get_replies',
+    data:{'id_answer':answerID},
+    success:function(response){
+      if (response["result"] === "success") {
+        let replies = response["replies"];
+        let count_replies = replies['count_replies']
+        console.log(response['replies'])
+        if(replies.length>0){
+          for (let i = 0; i < replies.length; i++) {
+              let reply = replies[i];
+              let time_reply = new Date(reply["date"]);
+              let time_before2 = time2str(time_reply);
+              let reply_temp =
                   `
-                  <div class="w-100 px-lg-3 p-sm-1">
-                  <div>
-                      <div class="d-flex flex-row mb-4">
-                          <a class="image is-48x48" style="width:62px;" href="/user/${answer["username"]}">
-                              <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
+                  
+                      <div class="d-flex flex-row mt-4 mb-4">
+                          <a class="image is-48x48" style="width:62px;" href="/user/${reply["username"]}">
+                              <img class="is-rounded" style="width:48px;" src="../static/${reply["profile_pic_real"]}"
                                   alt="Image">
                           </a>
                           <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
                               <p class="m-0 p-0">
-                                  <strong>${answer["profile_name"]}</strong>                 
+                                  <strong>${reply["profile_name"]}</strong> 
+                                  <small>reply to @${userReplyTo}<small>                
                               </p>
                               <p class="m-0 p-0">
-                              <small>@${answer["username"]}</small> <small>${time_before2}</small>      
+                              <small>@${reply["username"]}</small> <small>${time_before2}</small>      
                               </p>
                             
-                              <p>${answer['answer']}</p>
+                              <p>${reply['reply']}</p>
                             
                           </div>
                       </div>
-                  
-                  </div> 
+
                   `
 
-            $(`#answer-${postID}`).append(answer_temp);
-            $(`#answer_count_${postID}`).empty()
-            $(`#answer_count_${postID}`).append(answer_count);
+            
+            $('#replies_'+answerID).append(reply_temp);
                 
             }
           }
@@ -653,7 +836,6 @@ function get_posts_by_topic(topic) {
 
   })  
 }
-
   function getAnswer_detail(postID) {
     $.ajax({
     type:"POST",
@@ -662,13 +844,15 @@ function get_posts_by_topic(topic) {
     success:function(response){
       if (response["result"] === "success") {
         let answers = response["answers"];
-        let count = answers.length
+        
+        let reply_counting = 0
         console.log(response['answers'])
-        let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
+       
         if(answers.length>0){
           for (let i = 0; i < answers.length; i++) {
               let answer = answers[i];
               let time_answer = new Date(answer["date"]);
+              let count_replies = num2str(answer["count_replies"])
               let time_before2 = time2str(time_answer);
               let answer_temp =
                   `
@@ -679,27 +863,46 @@ function get_posts_by_topic(topic) {
                               <img class="is-rounded" style="width:48px;" src="../static/${answer["profile_pic_real"]}"
                                   alt="Image">
                           </a>
-                          <div class="card d-flex flex-column mx-2 p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
-                              <p class="m-0 p-0">
-                                  <strong>${answer["profile_name"]}</strong>                 
-                              </p>
-                              <p class="m-0 p-0">
-                              <small>@${answer["username"]}</small> <small>${time_before2}</small>      
-                              </p>
-                            
-                              <p>${answer['answer']}</p>
-                            
+                          <div class="d-flex flex-column mx-2  w-100">
+                          <div class="card d-flex flex-column p-3 w-100 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);">
+                                <p class="m-0 p-0">
+                                    <strong>${answer["profile_name"]}</strong>                 
+                                </p>
+                                <p class="m-0 p-0">
+                                <small>@${answer["username"]}</small> <small>${time_before2}</small>      
+                                </p>
+                              
+                                <p>${answer['answer']}</p>
+                                
+  
+                          </div>
+                          <a class="reply-link mx-3" id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
+                              <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
+                                
+                                <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                                  <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                                  <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
+                                </div>
+
+                                <div id="replies_${answer["_id"]}">
+                                </div>
+                              </div>
                           </div>
                       </div>
                   
-                  </div> 
+                  </div>
                   `
 
-            $('#answer').append(answer_temp);
-            $(`#answer_count_${postID}`).empty()
-            $(`#answer_count_${postID}`).append(answer_count);
+            getReplies_detail(answer["_id"],answer["username"])
+                  
+            $(`#answer`).append(answer_temp);
+            reply_counting += parseInt(count_replies)
                 
             }
+          let count = answers.length+reply_counting
+          let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
+          $(`#answer_count_${postID}`).empty()
+          $(`#answer_count_${postID}`).append(answer_count);
           }
       }
     }

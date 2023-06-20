@@ -49,6 +49,48 @@ def index():
 def about():
     return render_template("about.html")
 
+@app.route("/update_like", methods=["POST"])
+def update_like():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive, 
+            SECRET_KEY,
+            algorithms=["HS256"]
+            )
+        user_info = db.normal_users.find_one({"username": payload["id"]})
+        user_info2 = db.expert_users.find_one({"username": payload["id"]})
+        post_id_receive = request.form["post_id_give"]
+        type_receive = request.form["type_give"]
+        action_receive = request.form["action_give"]
+        if user_info:
+            if user_info['role'] != 'admin':
+                
+                doc = {
+                    "post_id": post_id_receive,
+                    "id_user":str( user_info["_id"]),
+                    "type": type_receive
+                }
+                if action_receive =="like":
+                    db.likes.insert_one(doc)
+                else:
+                    db.likes.delete_one(doc)
+        elif user_info2:
+            if user_info2['role'] != 'admin':
+                
+                doc = {
+                    "post_id": post_id_receive,
+                    "id_user": str(user_info2["_id"]),
+                    "type": type_receive
+                }
+                if action_receive =="like":
+                    db.likes.insert_one(doc)
+                else:
+                    db.likes.delete_one(doc)
+        count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})
+        return jsonify({"result": "success", 'msg': 'updated', "count": count})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("index"))
 
 @app.route('/create_post')
 def create_post():
@@ -773,6 +815,13 @@ def post_detail(id_post):
                     'post_pic_real':post['post_pic_real'],
                     'post_pic':post['post_pic']
                 }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))
                 
             if user2:
                 doc = {
@@ -787,7 +836,14 @@ def post_detail(id_post):
                     'date':post['date'],
                     'post_pic_real':post['post_pic_real'],
                     'post_pic':post['post_pic']
-                }        
+                }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))        
             
             if user_info:
                 return render_template('post_detail.html',
@@ -986,12 +1042,15 @@ def get_posts():
             algorithms=["HS256"]
             )
         username_receive = request.args.get('username_give')
+        user_info = db.normal_users.find_one({"username": payload["id"]})
+        user_info2 = db.expert_users.find_one({"username": payload["id"]})
         list_posts = []
         if username_receive == '':
             posts = list(db.posts.find({}).sort("date", -1).limit(10))
         else:
             posts = list(db.posts.find({'id_user':username_receive}).sort("date", -1).limit(10))
-    
+
+        
         for post in posts:
             user1 = db.normal_users.find_one({'_id':ObjectId(post['id_user'])})
             user2 = db.expert_users.find_one({'_id':ObjectId(post['id_user'])})
@@ -1010,6 +1069,14 @@ def get_posts():
                     'post_pic_real':post['post_pic_real'],
                     'post_pic':post['post_pic']
                 }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))
+
                 
             if user2:
                 doc = {
@@ -1025,8 +1092,16 @@ def get_posts():
                     'post_pic_real':post['post_pic_real'],
                     'post_pic':post['post_pic']
                 }
+                doc["count_up"] = db.likes.count_documents({"post_id": str(post['_id']), "type": "up"})
+                if user_info:
+                    if user_info['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info['_id'])}))
+                elif user_info2:
+                    if user_info2['role'] != 'admin':
+                        doc["up_by_me"] = bool(db.likes.find_one({"post_id": str(post['_id']), "type": "up", "id_user": str(user_info2['_id'])}))
+
             list_posts.append(doc)
-        
+            
         
         return jsonify({
             "result": "success",

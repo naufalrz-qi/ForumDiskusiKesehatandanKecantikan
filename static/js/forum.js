@@ -210,14 +210,7 @@ function get_posts(username) {
 
   function showPost(post, time_post) {  
     let time_before = time2str(time_post);
-    let class_heart = post['heart_by_me'] ? "fa-heart": "fa-heart-o"
-    let class_star = post['star_by_me'] ? "fa-star": "fa-star-o"
-    let class_thumbsup = post['thumbsup_by_me'] ? "fa-thumbs-up": "fa-thumbs-o-up"
-    /*if (post["heart_by_me"]) {
-        class_heart = "fa-heart"
-    } else {
-        class_heart = "fa-heart-o"
-    }*/
+    let class_up = post['up_by_me'] ? "is-primary": "text-body-tertiary"
     const username = $('script[data-username]').data('username');
     let id_post = post['_id']
     let editPostHtml = '';
@@ -275,6 +268,13 @@ function get_posts(username) {
             </div>
 
             
+            <hr class="separator m-0 my-3 mx-5 p-0 px-5">
+            <div class="d-flex justify-content-end px-5">
+              <a id="up_${post['_id']}" onclick="toggle_up('${post["_id"]}', 'up')" class="bi bi-arrow-up has-text-weight-bold me-3 ${class_up}" style="font-size:16px;">
+                <span class="up-num">${num2str(post["count_up"])}</span>
+              </a>
+              <a id="answer_count_${post['_id']}" class="bi bi-chat-left has-text-weight-bold text-body-tertiary" style="font-size:16px;"></a>
+            </div>
             <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <section id="answer" class="p-3">
               <p class="h6 has-text-weight-bold px-lg-3"><a class="text-body-secondary" href="/post_detail/${post['_id']}" >See another answer</a></p>
@@ -401,6 +401,57 @@ function get_posts(username) {
     $("#discussion").append(html_temp);
   }
 
+  function num2str(count_number) {
+    let count = parseInt(count_number)
+    if (count > 10000) {
+        return parseInt(count / 1000) + "k"
+    }
+    if (count > 500) {
+        return parseInt(count / 100) / 10 + "k"
+    }
+    if (count == 0) {
+        return ""
+    }
+    return count
+}
+
+
+  function toggle_up(post_id, type) {
+    console.log(post_id, type);
+    let $a_like = $(`#up_${post_id}`);
+    if ($a_like.hasClass("is-primary")) {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "unlike",
+        },
+        success: function (response) {
+          console.log("unlike");
+          $a_like.addClass("text-body-tertiary").removeClass("is-primary");
+          $a_like.find("span.up-num").text(num2str(response["count"]));
+        },
+      });
+    } else {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "like",
+        },
+        success: function (response) {
+          console.log("like");
+          $a_like.addClass("is-primary").removeClass("text-body-tertiary");
+          $a_like.find("span.up-num").text(num2str(response["count"]));
+        },
+      });
+    }
+  }
+
   function closeModal() {
     // Hide the modal
     $(".modal").removeClass("is-active");
@@ -450,7 +501,8 @@ function get_posts(username) {
     success:function(response){
       if (response["result"] === "success") {
         let answers = response["answers"];
-        console.log(response['answers'])
+        let count = answers.length
+        let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
         if(answers.length>0 & answers.length<3){
         for (let i = 0; i < 2; i++) {
             let answer = answers[i];
@@ -481,8 +533,12 @@ function get_posts(username) {
                 </div> 
                 `
             $(`#answer-${postID}`).append(answer_temp);
+            $(`#answer_count_${postID}`).empty()
+            $(`#answer_count_${postID}`).append(answer_count);
 
           }
+          
+
         }
         else if(answers.length>=3){
           for (let i = 0; i < 3; i++) {
@@ -515,6 +571,8 @@ function get_posts(username) {
                   `
 
             $(`#answer-${postID}`).append(answer_temp);
+            $(`#answer_count_${postID}`).empty()
+            $(`#answer_count_${postID}`).append(answer_count);
                 
             }
           }
@@ -532,7 +590,9 @@ function get_posts(username) {
     success:function(response){
       if (response["result"] === "success") {
         let answers = response["answers"];
+        let count = answers.length
         console.log(response['answers'])
+        let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
         if(answers.length>0){
           for (let i = 0; i < answers.length; i++) {
               let answer = answers[i];
@@ -564,6 +624,8 @@ function get_posts(username) {
                   `
 
             $('#answer').append(answer_temp);
+            $(`#answer_count_${postID}`).empty()
+            $(`#answer_count_${postID}`).append(answer_count);
                 
             }
           }

@@ -7,6 +7,9 @@ import hashlib
 from werkzeug.utils import secure_filename
 import zipfile
 import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
 
 
 app = Flask(__name__)
@@ -14,10 +17,16 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD']=True
 app.config['UPLOAD_FOLDER'] = './static/profile_pics'
 
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+MONGODB_CONNECTION_STRING = os.environ.get("MONGODB_URI")
+DB_NAME =  os.environ.get("DB_NAME")
+
 SECRET_KEY = 'TimProjek2'
-MONGODB_CONNECTION_STRING = 'mongodb+srv://user1:123@cluster0.g1iutgc.mongodb.net/?retryWrites=true&w=majority'
+
 client = MongoClient(MONGODB_CONNECTION_STRING)
-db = client.finalprojectForumHnB
+db = client[DB_NAME]
 TOKEN_KEY = 'my_token'
 topics_collection = db["topics"]
 

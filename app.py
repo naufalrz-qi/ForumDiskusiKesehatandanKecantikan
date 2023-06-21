@@ -152,7 +152,7 @@ def insert_topics():
     else:
         return "Collection 'topics' sudah berisi data"
     
-# insert_topics()
+#insert_topics()
 
 @app.route('/')
 def index():
@@ -171,6 +171,8 @@ def index():
                 return render_template('forum_after.html',user_info=user_info)
             elif user_info2:
                 return render_template('forum_after.html',user_info=user_info2)
+            else:
+                return render_template('index.html')
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -337,6 +339,8 @@ def expert_verification():
                     return render_template('forum_after.html',user_info=user_info, msg="You are not an expert")
             elif user_info2:
                 return render_template('expert_verification.html',user_info=user_info2,msg=msg)
+            else:
+                return redirect(url_for("index"))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -367,6 +371,8 @@ def create_post():
                     return render_template('create_post.html',user_info=user_info)
             elif user_info2:
                 return render_template('create_post.html',user_info=user_info2)
+            else:
+                return redirect(url_for("index"))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -409,7 +415,8 @@ def edit_post(id_post):
                     return render_template('edit_post.html',post=doc,user_info=user_info)
             elif user_info2:
                 return render_template('edit_post.html',post=doc,user_info=user_info2)
-            
+            else:
+                return redirect(url_for("index"))
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
             return redirect(url_for('login', msg=msg))
@@ -562,6 +569,8 @@ def report_data():
                     return render_template('forum_after.html',user_info=user_info)
             elif user_info2:
                 return render_template('forum_after.html',user_info=user_info2)
+            else:
+                return redirect(url_for("index"))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -589,6 +598,8 @@ def topics():
                 return render_template('topics.html',user_info=user_info)
             elif user_info2:
                 return render_template('topics.html',user_info=user_info2)
+            else:
+                return redirect(url_for("index"))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -787,6 +798,9 @@ def register():
                 return render_template('forum_after.html',user_info=user_info)
             elif user_info2:
                 return render_template('forum_after.html',user_info=user_info2)
+            else:
+                return render_template('register.html')
+                
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -818,6 +832,9 @@ def login():
                     return render_template('forum_after.html',user_info=user_info)
                 elif user_info2:
                     return render_template('forum_after.html',user_info=user_info2)
+                else:
+                    return render_template('login.html')
+                    
             except jwt.ExpiredSignatureError:
                 msg='Your token has expired'
                 return redirect(url_for('login', msg=msg))
@@ -909,6 +926,8 @@ def user(username):
                         user_info=user_info2,
                         status=status
                         )
+            else:
+                return redirect(url_for("index"))
     except (jwt.ExpiredSignatureError,jwt.exceptions.DecodeError):
         return redirect(url_for('index'))
 
@@ -980,6 +999,9 @@ def save_img():
                 "result": "success", 
                 "msg": "Your profile has been updated"
                 })
+        else:
+            return redirect(url_for("index"))
+            
         
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -1680,6 +1702,9 @@ def post_detail(id_post):
                                        user_info=user_info2,
                                         post=doc
                 )
+            else:
+                return redirect(url_for("index"))
+                
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -1872,6 +1897,8 @@ def urltopics(topic):
                 return render_template('post_by_topics.html',user_info=user_info, topic=topic)
             elif user_info2:
                 return render_template('post_by_topics.html',user_info=user_info2, topic=topic)
+            else:
+                return redirect(url_for("index"))
             
         except jwt.ExpiredSignatureError:
             msg='Your token has expired'
@@ -1880,7 +1907,7 @@ def urltopics(topic):
             msg='There was a problem logging you in'
             return redirect(url_for('login', msg=msg))
     else:
-        return render_template('index.html')
+        return redirect(url_for("index"))
     
 @app.route("/get_topics", methods=["GET"])
 def get_topics():

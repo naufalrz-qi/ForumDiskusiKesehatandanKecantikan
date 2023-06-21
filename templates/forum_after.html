@@ -34,8 +34,7 @@
             $("#popular-posts").empty()
             $("#must-read").empty()
             get_posts2()
-            let dropdownToggle = $('#answer_drop_toggle_${answer["_id"]}');
-            dropdownToggle.dropdown();
+            
             var messageStatus = "{{ msg }}" || "";
 
             if (messageStatus.startsWith('Your post') && messageStatus.endsWith('has been deleted')) {

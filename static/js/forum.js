@@ -464,7 +464,8 @@ function get_posts(username) {
   }
 
   function num2str(count_number) {
-    if(count_number!=''){
+    console.log(count_number)
+    if(count_number!='' || count_number!=undefined){
       let count = parseInt(count_number)
     if (count > 10000) {
         return parseInt(count / 1000) + "k"
@@ -473,7 +474,7 @@ function get_posts(username) {
         return parseInt(count / 100) / 10 + "k"
     }
     if (count == 0) {
-        return ""
+        return 0
     }
     return count
     }else{
@@ -637,14 +638,17 @@ function get_posts_by_topic(topic) {
     success:function(response){
       const username = $('script[data-username]').data('username');
      
-    
+      
       if (response["result"] === "success") {
         let answers = response["answers"];
         console.log(answers)
         let reply_counting = 0
+        let reply_counting2 = 0
         if(answers.length>0 & answers.length<3){
         for (let i = 0; i < 2; i++) {
             let answer = answers[i];
+            let dropdownToggle = $('#answer_drop_toggle_'+answer["_id"]);
+            dropdownToggle.dropdown();
             let count_replies = num2str(answer["count_replies"])
             console.log(count_replies)
             let time_answer = new Date(answer["date"]);
@@ -709,13 +713,6 @@ function get_posts_by_topic(topic) {
                           </div>
                         </div>
                        
-
-                          
-
-
-
-
-
                     </div>
                 
                 </div>
@@ -729,10 +726,10 @@ function get_posts_by_topic(topic) {
                     </header>
                     <section class="modal-card-body">
                       <div class="field">
-                        <label class="label" for="issueType">Type of Issue</label>
+                        <label class="label" for="issueTypeAnswer">Type of Issue</label>
                         <div class="control">
                           <div class="select">
-                            <select id="issueType">
+                            <select id="issueTypeAnswer">
                               <option value="Technical Error" selected>Technical Error</option>
                               <option value="Unclear Answer">Unclear Answer</option>
                               <option value="Rule Violation">Rule Violation</option>
@@ -748,9 +745,9 @@ function get_posts_by_topic(topic) {
                         </div>
                       </div>
                       <div class="field">
-                        <label class="label" for="issueDescription">Description</label>
+                        <label class="label" for="issueDescriptionAnswer">Description</label>
                         <div class="control">
-                          <textarea class="textarea" id="issueDescription"></textarea>
+                          <textarea class="textarea" id="issueDescriptionAnswer"></textarea>
                         </div>
                       </div>
                     </section>
@@ -774,6 +771,8 @@ function get_posts_by_topic(topic) {
         else if(answers.length>=3){
           for (let i = 0; i < 3; i++) {
               let answer = answers[i];
+              let dropdownToggle = $('#answer_drop_toggle_'+answer["_id"]);
+              dropdownToggle.dropdown();
               let count_replies = num2str(answer["count_replies"])
               let time_answer = new Date(answer["date"]);
               let time_before2 = time2str(time_answer);
@@ -857,10 +856,10 @@ function get_posts_by_topic(topic) {
                   </header>
                   <section class="modal-card-body">
                     <div class="field">
-                      <label class="label" for="issueType">Type of Issue</label>
+                      <label class="label" for="issueTypeAnswer">Type of Issue</label>
                       <div class="control">
                         <div class="select">
-                          <select id="issueType">
+                          <select id="issueTypeAnswer">
                             <option value="Technical Error" selected>Technical Error</option>
                             <option value="Unclear Answer">Unclear Answer</option>
                             <option value="Rule Violation">Rule Violation</option>
@@ -876,9 +875,9 @@ function get_posts_by_topic(topic) {
                       </div>
                     </div>
                     <div class="field">
-                      <label class="label" for="issueDescription">Description</label>
+                      <label class="label" for="issueDescriptionAnswer">Description</label>
                       <div class="control">
-                        <textarea class="textarea" id="issueDescription"></textarea>
+                        <textarea class="textarea" id="issueDescriptionAnswer"></textarea>
                       </div>
                     </div>
                   </section>
@@ -891,10 +890,10 @@ function get_posts_by_topic(topic) {
               `
 
             $(`#answer-${postID}`).append(answer_temp);
-            reply_counting += parseInt(count_replies)
+            reply_counting2 += parseInt(count_replies)
                 
             }
-          let count = answers.length+reply_counting
+          let count = answers.length+reply_counting2
           let answer_count = `<span style="font-size: 16px;"> ${count}</span>`
           $(`#answer_count_${postID}`).empty()
           $(`#answer_count_${postID}`).append(answer_count);
@@ -980,10 +979,10 @@ function toggleReplyContainer(answerID) {
                           </header>
                           <section class="modal-card-body">
                             <div class="field">
-                              <label class="label" for="issueType">Type of Issue</label>
+                              <label class="label" for="issueTypeReply">Type of Issue</label>
                               <div class="control">
                                 <div class="select">
-                                  <select id="issueType">
+                                  <select id="issueTypeReply">
                                     <option value="Technical Error" selected>Technical Error</option>
                                     <option value="Unclear Reply">Unclear Reply</option>
                                     <option value="Rule Violation">Rule Violation</option>
@@ -999,9 +998,9 @@ function toggleReplyContainer(answerID) {
                               </div>
                             </div>
                             <div class="field">
-                              <label class="label" for="issueDescription">Description</label>
+                              <label class="label" for="issueDescriptionReply">Description</label>
                               <div class="control">
-                                <textarea class="textarea" id="issueDescription"></textarea>
+                                <textarea class="textarea" id="issueDescriptionReply"></textarea>
                               </div>
                             </div>
                           </section>
@@ -1124,10 +1123,10 @@ function toggleReplyContainer(answerID) {
                   </header>
                   <section class="modal-card-body">
                     <div class="field">
-                      <label class="label" for="issueType">Type of Issue</label>
+                      <label class="label" for="issueTypeAnswer">Type of Issue</label>
                       <div class="control">
                         <div class="select">
-                          <select id="issueType">
+                          <select id="issueTypeAnswer">
                             <option value="Technical Error" selected>Technical Error</option>
                             <option value="Unclear Answer">Unclear Answer</option>
                             <option value="Rule Violation">Rule Violation</option>
@@ -1143,9 +1142,9 @@ function toggleReplyContainer(answerID) {
                       </div>
                     </div>
                     <div class="field">
-                      <label class="label" for="issueDescription">Description</label>
+                      <label class="label" for="issueDescriptionAnswer">Description</label>
                       <div class="control">
-                        <textarea class="textarea" id="issueDescription"></textarea>
+                        <textarea class="textarea" id="issueDescriptionAnswer"></textarea>
                       </div>
                     </div>
                   </section>
@@ -1245,8 +1244,8 @@ function confirmDeleteAnswer(answerId) {
 
 function submitReportAnswer(id_post,answerID) {
   // Get the values from the input fields
-  let issueType = $("#issueType").val();
-  let description = $("#issueDescription").val();
+  let issueType = $("#issueTypeAnswer").val();
+  let description = $("#issueDescriptionAnswer").val();
   
   // Perform validation, e.g., check if the fields are empty
   
@@ -1325,8 +1324,8 @@ function confirmDeleteReply(replyId) {
 
 function submitReportReply(answerID,replyID) {
   // Get the values from the input fields
-  let issueType = $("#issueType").val();
-  let description = $("#issueDescription").val();
+  let issueType = $("#issueTypeReply").val();
+  let description = $("#issueDescriptionReply").val();
   
   // Perform validation, e.g., check if the fields are empty
   

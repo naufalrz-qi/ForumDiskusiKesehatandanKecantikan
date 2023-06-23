@@ -43,7 +43,7 @@
                         {% endif %}                 
                     </p>
                     <p class="m-0 p-0">
-                    <small>{{ post.username }}</small> <small id="time_before"></small>      
+                    <small>@{{ post.username }}</small> <small id="time_before"></small>      
                     </p>   
                 </div>
             </div>
@@ -93,31 +93,7 @@
                                                                 placeholder="Answer the question"></textarea>
                                                   </p>
                                               </div>
-                                              <div class="field control is-expanded">
-                                        <label class="label">Add image</label>
-                                        <div class="file has-name py-2">
-                                          <label class="file-label" style="width: 100%">
-                                            <input
-                                              id="input_answer_pic_{{ post._id }}"
-                                              class="file-input"
-                                              type="file"
-                                              name="resume"
-                                            />
-                                            <span class="file-cta"
-                                              ><span class="file-icon"
-                                                ><i class="fa fa-upload"></i
-                                              ></span>
-                                              <span class="file-label">Select a file</span>
-                                            </span>
-                                            <span
-                                              id="file_name"
-                                              class="file-name"
-                                              style="width: 100%; max-width: 100%"
-                                              ></span
-                                            >
-                                          </label>
-                                        </div>
-                                      </div>
+                                              
                                               <nav class="level is-mobile">
                                                   <div class="level-right">
                                                       <div class="level-item">

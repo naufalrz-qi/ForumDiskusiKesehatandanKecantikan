@@ -79,7 +79,7 @@ function post() {
 
 function answer(id_post) {
     let input_answer = $("#textarea-answer-"+id_post).val()
-    let file = $("#input_answer_pic_"+id_post)[0].files[0]
+    let file = ''
     let paragraph = input_answer.split("\n")
     let answer = ""
     for(let i = 0; i<paragraph.length; i++){
@@ -344,31 +344,7 @@ function get_posts(username) {
                                                                     placeholder="Answer the question"></textarea>
                                                       </p>
                                                   </div>
-                                                  <div class="field control is-expanded">
-                                            <label class="label">Add image</label>
-                                            <div class="file has-name py-2">
-                                              <label class="file-label" style="width: 100%">
-                                                <input
-                                                  id="input_answer_pic_${post['_id']}"
-                                                  class="file-input"
-                                                  type="file"
-                                                  name="resume"
-                                                />
-                                                <span class="file-cta"
-                                                  ><span class="file-icon"
-                                                    ><i class="fa fa-upload"></i
-                                                  ></span>
-                                                  <span class="file-label">Select a file</span>
-                                                </span>
-                                                <span
-                                                  id="file_name"
-                                                  class="file-name"
-                                                  style="width: 100%; max-width: 100%"
-                                                  ></span
-                                                >
-                                              </label>
-                                            </div>
-                                          </div>
+                                                 
                                                   <nav class="level is-mobile">
                                                       <div class="level-right">
                                                           <div class="level-item">
@@ -697,7 +673,8 @@ function get_posts_by_topic(topic) {
                             <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                               
                               <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
-                                <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                              <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
+
                                 <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
                               </div>
                             </div>
@@ -819,7 +796,8 @@ function get_posts_by_topic(topic) {
                           <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                             
                             <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
-                              <input type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply...">
+                            <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
+
                               <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
                             </div>
                           </div>
@@ -1405,7 +1383,7 @@ function sendReply(answerId, postID, userReplyTo) {
     },
     success: function(response) {
       if (response.result === "success") {
-        alert("Your reply has been sended");
+        alert(response['msg']);
         $(`#reply_toggle_`+answerId).text('reply('+num2str(response["count_replies"])+')');
         getReplies_detail(answerId,userReplyTo)
       }

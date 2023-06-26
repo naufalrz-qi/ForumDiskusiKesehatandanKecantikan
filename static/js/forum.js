@@ -102,9 +102,14 @@ function answer(id_post) {
         success: function (response) {
             if (response["result"] === "success") {
                 swal("Success", response["msg"], "success");
+                $(`#answer2`).empty()
                 $(`#answer-`+id_post).empty()
+                $(`#textarea-answer-`+id_post).val('')
+                $("#modal-answer").removeClass("is-active")
                 $("#modal-answer-"+id_post).removeClass("is-active")
+                
                 getAnswer(id_post)
+                getAnswer_detail(id_post)
 
               }
             else if(response["result"] === 'failed'){
@@ -1218,7 +1223,7 @@ function toggleReplyContainer(answerID) {
 
             getReplies_detail(answer["_id"],answer["username"])
                   
-            $(`#answer`).append(answer_temp);
+            $(`#answer2`).append(answer_temp);
             reply_counting += parseInt(count_replies)
                 
             }

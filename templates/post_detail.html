@@ -20,6 +20,8 @@
               {% if post.username == user_info.username %}
               <a class="dropdown-item" href="/edit_post/{{ post._id }}"><span>Edit Post</span></a>
               <a class="dropdown-item" href="#" onclick="confirmDelete('{{ post._id }}')"><span>Delete Post</span></a>
+              {% elif user_info.username == 'admin' %}
+              <a class="dropdown-item" href="#" onclick="confirmDelete('{{ post._id }}')"><span>Delete Post</span></a>
               {% endif %}  
               <a class="dropdown-item" href="#" onclick="showReportModal('{{ post._id }}')"><span>Report</span></a>
             </div>
@@ -155,7 +157,7 @@
                   </div>
               </div>
           </article>
-          <div id="answer">
+          <div id="answer2">
              
           </div>
         </section>

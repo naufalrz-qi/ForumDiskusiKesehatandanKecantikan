@@ -9,6 +9,7 @@ import zipfile
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+import pytz
 
 from auth import b_auth
 from answers import b_answers
@@ -388,9 +389,48 @@ def verifying():
                 if user_info['role'] == 'admin':
                     user = db.expert_users.find_one({'_id':ObjectId(user_id)})
                     db.expert_users.update_one({'_id':ObjectId(user_id)},{'$set':{'status':'verified'}})
+                    send_notifications(user_id,payload['id'],'You has been verified as an expert','#')
                     return jsonify({
                         'result':'success',
                         'msg':'User '+user['username']+' has been verified'
+                    })
+                else: 
+                    return redirect(url_for('index'))
+            elif user_info2:
+                return redirect(url_for('index'))
+            
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('auth.login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('auth.login', msg=msg))
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/decline_expert', methods=['POST'])
+def decline_expert():
+    id = request.form['id']
+    user_id = request.form['user_id']
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user_info = db.normal_users.find_one({'username':payload.get('id')})
+            user_info2 = db.expert_users.find_one({'username':payload.get('id')})
+            
+            if user_info:
+                if user_info['role'] == 'admin':
+                    user = db.expert_users.find_one({'_id':ObjectId(user_id)})
+                    db.expert_datas.delete_one({'_id':ObjectId(id)})
+                    send_notifications(user_id,payload['id'],'Your request or expert verification has been declined by admin. Please check your data and try to submit it again.','#')
+                    return jsonify({
+                        'result':'success',
+                        'msg':'User '+user['username']+' request has been declined'
                     })
                 else: 
                     return redirect(url_for('index'))
@@ -511,6 +551,64 @@ def get_topics():
         "topics": topics
     })    
  
+@app.route("/get_notifications", methods=["GET"])
+def get_notifications():
+    token_receive = request.cookies.get(TOKEN_KEY)
+    if token_receive:
+        try:
+            payload = jwt.decode(
+                token_receive,
+                SECRET_KEY,
+                algorithms=['HS256']
+            )
+            user = db.normal_users.find_one({'username':payload['id']})
+            user2 = db.expert_users.find_one({'username':payload['id']})
+            
+            if user:
+                count = db.notifications.count_documents({'to_user':str(user['_id']),'status':'unread'})
+                notifications = list(db.notifications.find({'to_user':str(user['_id'])},{'_id':False}).sort("date", -1).limit(10))
+                db.notifications.update_many({'to_user':str(user['_id'])},{'$set':{'status':'read'}})
+                return jsonify({
+                    "result": "success",
+                    "notifications": notifications,
+                    'count':count
+                })
+            elif user2:
+                count = db.notifications.count_documents({'to_user':str(user2['_id']),'status':'unread'})
+                notifications = list(db.notifications.find({'to_user':str(user2['_id'])},{'_id':False}).sort("date", -1).limit(10))
+                db.notifications.update_many({'to_user':str(user2['_id'])},{'$set':{'status':'read'}})
+                return jsonify({
+                    "result": "success",
+                    "notifications": notifications,
+                    'count':count
+                })
+            else:
+                return jsonify({
+                    "result": "failed",
+                    'count':count
+                })
+        except jwt.ExpiredSignatureError:
+            msg='Your token has expired'
+            return redirect(url_for('auth.login', msg=msg))
+        except jwt.exceptions.DecodeError:
+            msg='There was a problem logging you in'
+            return redirect(url_for('auth.login', msg=msg))
+    else:
+        return redirect(url_for("index"))    
+ 
+def send_notifications(to_user,by_user,message,link):
+    date = datetime.now(pytz.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    doc = {
+        'to_user':to_user,
+        'by_user':by_user,
+        'message':message,
+        'status':'unread',
+        'link':link,
+        'date':date
+    }
+    db.notifications.insert_one(doc)
+    
+    
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000, debug=True)
  

@@ -16,10 +16,10 @@ function sign_up() {
     let role = selectRole.val()
     
     if (helpUser.hasClass('is-danger')){
-        alert('Please check your id')
+        swal("Failed","Please check your username", "error");
         return;
     }else if(!helpUser.hasClass('is-success')){
-        alert('Please double check your id, something is wrong')
+        swal("Failed","Please check your username again, something is wrong", "error");
         return;
     }
 
@@ -82,10 +82,10 @@ function sign_up() {
         },
         success: function (response) {
         if(response["result"] == 'success'){
-            alert("You are registered! Nice!");
+            swal("Success","Your username has been registered", "success");
             window.location.replace("/login");
         }else{
-            alert("Something went wrong")
+            swal("Failed","Something went wrong", "error");
         }
         
         },

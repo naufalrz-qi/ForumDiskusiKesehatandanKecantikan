@@ -16,7 +16,6 @@
         <th scope="col">Type of Issue</th>
         <th scope="col">Description</th>
         <th scope="col">Link</th>
-        <th scope="col">action</th>
       </tr>
     </thead>
     <tbody>
@@ -28,7 +27,6 @@
         <td>{{ report.issue_type }}</td>
         <td>{{ report.description }}</td>
         <td><a class="button is-info" href="{{ report.link }}">Post Link</a></td>
-        <td><a class="button is-danger" href="">BAN</a></td>
       </tr>
       {% endfor %} 
     </tbody>

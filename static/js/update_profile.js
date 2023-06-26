@@ -39,7 +39,7 @@ function update_profile(user_role) {
       processData: false,
       success: function (response) {
         if (response["result"] === "success") {
-          alert(response["msg"]);
+          swal("Success",response["msg"], "success");
           window.location.reload();
         }
       },

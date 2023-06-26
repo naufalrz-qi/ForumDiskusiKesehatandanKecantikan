@@ -5,8 +5,22 @@ import jwt
 from datetime import datetime, timedelta
 import hashlib
 from werkzeug.utils import secure_filename
+import pytz
+
 
 b_replies = Blueprint('replies', __name__)
+
+def send_notifications(to_user,by_user,message,link):
+    date = datetime.now(pytz.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    doc = {
+        'to_user':to_user,
+        'by_user':by_user,
+        'message':message,
+        'status':'unread',
+        'link':link,
+        'date':date
+    }
+    g.db.notifications.insert_one(doc)
 
 @b_replies.before_app_request
 def before_request():
@@ -91,37 +105,42 @@ def delete_reply():
             )
         user_info = g.db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = g.db.expert_users.find_one({'username':payload.get('id')})
-        
+        username = payload['id']
 
         id_reply = request.form["id_reply"]
-        
+        reply = g.db.replies.find_one({'_id':ObjectId(id_reply)})
         if user_info:
             if user_info['role'] == 'admin':
+                g.db.replies.delete_one({"_id": ObjectId(id_reply)})
+                send_notifications(reply['id_user'],payload['id'],f'{username} has removed your replies due to the violation you committed','#')
                 return jsonify({
-                    "result": "failed",
-                    "msg": "You're an admin"
-                })
-            else:
-
+                    "result": "success",
+                    "msg": "Reply successfully deleted!"
+                    })
+            elif reply['id_user'] == str(user_info['_id']):
                 g.db.replies.delete_one({"_id": ObjectId(id_reply)})
                 return jsonify({
                     "result": "success",
                     "msg": "Reply successfully deleted!"
                     })
-        
+            else:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "Something went wrong"
+                }) 
             
         elif user_info2:
-            if user_info2['role'] == 'admin':
-                return jsonify({
-                    "result": "failed",
-                    "msg": "You're an admin"
-                })
-            else:               
+            if reply['id_user'] == str(user_info2['_id']):              
                 g.db.replies.delete_one({"_id": ObjectId(id_reply)})
                 return jsonify({
                     "result": "success",
                     "msg": "Reply successfully deleted!"
                     })
+            else:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "Something went wrong"
+                })
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
@@ -202,6 +221,7 @@ def submit_reply():
         user_info = g.db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = g.db.expert_users.find_one({'username':payload.get('id')})
       
+        answer = g.db.answers.find_one({'_id':ObjectId(answer_id)})
         if user_info:
             if user_info['role'] != 'admin':
                 g.db.replies.insert_one({
@@ -213,10 +233,10 @@ def submit_reply():
                 })
                 
                 count_replies = g.db.replies.count_documents({"answer_id": answer_id})
-                
+                send_notifications(answer['id_user'],username,f'{username} replied your answer',f'/post_detail/{post_id}#answer_{answer_id}')
                 return jsonify({
                     "result": "success",
-                    "msg": "Reply berhasil dikirim",
+                    "msg": "Reply has been sended",
                     'count_replies':count_replies
                 })
             else:
@@ -236,12 +256,12 @@ def submit_reply():
                 'date': date,
                 
             })
-            
+            send_notifications(answer['id_user'],username,f'{username} replied your answer',f'/post_detail/{post_id}#answer_{answer_id}')
             count_replies = g.db.replies.count_documents({"answer_id": answer_id})
             
             return jsonify({
                 "result": "success",
-                "msg": "Reply berhasil dikirim",
+                "msg": "Reply has been sended",
                 'count_replies':count_replies
                 
             })

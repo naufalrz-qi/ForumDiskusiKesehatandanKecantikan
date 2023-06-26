@@ -48,7 +48,7 @@
             <td>{{ expertData.workplace }}</td>
             <td><a class="button is-info" style="padding: 5px; border: 0px; height: fit-content;" href="../static/{{ expertData.file_data }}">Download</a></td>
             <td class="d-flex"><a class="button is-primary" style="padding: 5px; border: 0px; height: fit-content;" onclick="verify_expert('{{ expertData._id }}','{{ expertData.id_user }}')">Verify</a>
-                <a class="button is-danger mx-1" style="padding: 5px; border: 0px; height: fit-content;" onclick="">Decline</a></td>
+                <a class="button is-danger mx-1" style="padding: 5px; border: 0px; height: fit-content;" onclick="decline_expert('{{ expertData._id }}','{{ expertData.id_user }}')">Decline</a></td>
           </tr>
           {% endif %}
           {% endfor %} 

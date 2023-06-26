@@ -28,11 +28,11 @@ function edit(id_post, id_user) {
         processData: false,
         success: function (response) {
             if (response["result"] === "success") {
-                alert(response["msg"]);
+                swal("Success",response["msg"], "success");
                 window.location.replace('/')
               }
               else if (response["result"] === "failed") {
-                alert(response["msg"]);
+                swal("Failed",response["msg"], "error");
                 window.location.replace('/')
               }
             
@@ -68,7 +68,7 @@ function post() {
         processData: false,
         success: function (response) {
             if (response["result"] === "success") {
-                alert(response["msg"]);
+                swal("Success",response["msg"], "success");
                 window.location.replace('/')
               }
             
@@ -101,13 +101,15 @@ function answer(id_post) {
         processData: false,
         success: function (response) {
             if (response["result"] === "success") {
-                alert(response["msg"]);
+                swal("Success", response["msg"], "success");
                 $(`#answer-`+id_post).empty()
+                $("#modal-answer-"+id_post).removeClass("is-active")
                 getAnswer(id_post)
 
               }
             else if(response["result"] === 'failed'){
-              alert(response['msg'])
+              swal("Failed",response["msg"], "error");
+
             }
             
         }
@@ -139,11 +141,13 @@ function editing_answer(id_post,text,answerID) {
         processData: false,
         success: function (response) {
             if (response["result"] === "success") {
-                alert(response["msg"]);
+              swal("Success",response["msg"], "success");
+
                 
               }
             else if(response["result"] === 'failed'){
-              alert(response['msg'])
+              swal("Failed",response["msg"], "error");
+
             }
             
         }
@@ -244,6 +248,31 @@ function get_posts(username) {
     }
   }
 
+function copy_button(id_post){
+  var shareLink = $("#shareLink"+id_post).val();
+
+    // Membuat elemen textarea sementara untuk menyalin teks
+    var tempTextarea = $("<textarea>").val(shareLink).css("position", "fixed").appendTo("body").select();
+
+    // Menyalin teks ke clipboard
+    document.execCommand("copy");
+
+    // Menghapus elemen textarea sementara
+    tempTextarea.remove();
+
+    // Menampilkan pesan sukses
+    swal("Link copied to clipboard!");
+}
+
+  function btn_share(id_post){
+      let currentURL = window.location.href;
+      let url = currentURL.split("/")
+      let modifiedUrl = url.slice(0, 3).join("/");
+      $('#modal-share-'+id_post).addClass('is-active');
+
+      $("#shareLink"+id_post).val(modifiedUrl + '/post_detail/'+ id_post);
+  }
+
   function showPost(post, time_post) {  
     let time_before = time2str(time_post);
     let class_up = post['up_by_me'] ? "is-primary": "text-body-tertiary"
@@ -255,15 +284,18 @@ function get_posts(username) {
               <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
              `
             }
+    let cek_admin = username === 'admin'
     let editPostHtml = '';
     if (post['username'] === username) {
     editPostHtml = `<a class="dropdown-item" href="/edit_post/${post['_id']}"><span>Edit post</span></a>
                     <a class="dropdown-item" href="#" onclick="confirmDelete('${post['_id']}')"><span>Delete Post</span></a>
     `;
-    }
+    }else if(cek_admin){
+      editPostHtml = `<a class="dropdown-item" href="#" onclick="confirmDelete('${post['_id']}')"><span>Delete Post</span></a>`
+    };
 
     let html_temp = `
-    
+      
         <div class="card w-100 my-3" style="border-radius: 30px;">
             <div class="card-body p-5">
             <div class="d-flex flex-row mb-5">
@@ -281,6 +313,7 @@ function get_posts(username) {
               </div>
             </div>
             </div>
+            
 
             <p class="h4 has-text-weight-bold">${post['title']}</p>
                 <div class="d-flex flex-row mb-4">
@@ -300,11 +333,13 @@ function get_posts(username) {
                 </div>
                 
                 <div class="mt-5">
+                  <a href="/post_detail/${post['_id']}" style="color: currentColor;">
                     <p>${post['question']}</p>
-                    
+                  </a>
                       
-                    
                 </div>
+                
+
             </div>
             <div class="d-flex justify-content-center" onclick="$('#img_post_${post['_id']}').toggleClass('w-100')" style="height: 300px;">
                 <img id="img_post_${post['_id']}" src="../static/${post['post_pic_real']}" alt="" class="w-100" style="object-fit: cover;">
@@ -316,7 +351,42 @@ function get_posts(username) {
               <a id="up_${post['_id']}" onclick="toggle_up('${post["_id"]}', 'up')" class="bi bi-arrow-up has-text-weight-bold me-3 ${class_up}" style="font-size:16px;">
                 <span class="up-num" style="font-size:16px;">${num2str(post["count_up"])}</span>
               </a>
-              <a id="answer_count_${post['_id']}" class="bi bi-chat-left has-text-weight-bold text-body-tertiary" style="font-size:16px;"></a>
+              <a id="answer_count_${post['_id']}" class="bi bi-chat-left has-text-weight-bold text-body-tertiary me-3" style="font-size:16px;"></a>
+              <a id="shareButton${id_post}" onclick="btn_share('${id_post}')" class="bi bi-share has-text-weight-bold text-body-tertiary" data-toggle="modal" data-target="#shareModal" style="font-size:16px;">
+                Share
+              </a>
+
+              <!-- Modal -->
+              <div class="modal" id="modal-share-${post['_id']}">
+                  <div class="modal-background" onclick='$("#modal-share-${post['_id']}").removeClass("is-active")'></div>
+                  <div class="modal-content">
+            
+                          <article class="media">
+                              <div class="media-content p-5">
+                                  <div class="field">
+                                  <input id="shareLink${post['_id']}" class="form-control" type="text" readonly>
+                                  </div>
+                                  
+                                  <nav class="level is-mobile">
+                                      <div class="level-right">
+                                          <div class="level-item">
+                                              <a class="button is-primary" id="copyButton${post['_id']}" onclick="copy_button('${id_post}')">Copy</a>
+                                          </div>
+                                          <div class="level-item">
+                                              <a class="button is-primary is-outlined"
+                                                onclick='$("#modal-share-${post['_id']}").removeClass("is-active")'>Cancel</a>
+                                          </div>
+                                      </div>
+                                  </nav>
+                              </div>
+                          </article>
+                      
+                  </div>
+                  <button class="modal-close is-large" aria-label="close"
+                          onclick='$("#modal-share-${post['_id']}").removeClass("is-active")'></button>
+              </div>
+   
+
             </div>
             <hr class="separator m-0 my-3 mx-5 p-0 px-5">
             <section id="answer" class="p-3">
@@ -416,7 +486,9 @@ function get_posts(username) {
 
         </div>
         
+        
     `;
+    
     $("#discussion").append(html_temp);
     let topicsElement = $("#topics_"+id_post);
 
@@ -582,7 +654,7 @@ function get_posts_by_topic(topic) {
       data: reportData,
       success: function(response) {
         // Handle the success response from the server
-        alert(response['msg'])
+        swal("Success",response["msg"], "success");
         // Close the modal
         closeModal();
       }
@@ -638,11 +710,13 @@ function get_posts_by_topic(topic) {
              `
             }
             let editAnswerHtml = '';
-
-            if (answer['username'] === username) {
+            let cek_admin = username === 'admin'
+            if (answer['username'] === username ) {
               editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
                               <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
               `;
+              }else if(cek_admin){
+                editAnswerHtml = `<a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>`
               }
             let answer_temp =
                 `
@@ -672,7 +746,7 @@ function get_posts_by_topic(topic) {
                         <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
                             <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                               
-                              <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                              <div class="d-flex flex-row card p-3 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
                               <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
 
                                 <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
@@ -761,11 +835,13 @@ function get_posts_by_topic(topic) {
              `
             }
               let editAnswerHtml = '';
-
+              let cek_admin = username === 'admin'
               if (answer['username'] === username) {
                 editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
                                 <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
                 `;
+                }else if( cek_admin){
+                  editAnswerHtml = `<a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>`
                 }
               let answer_temp =
               `
@@ -795,7 +871,7 @@ function get_posts_by_topic(topic) {
                       <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
                           <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                             
-                            <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                            <div class="d-flex flex-row card p-3 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
                             <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
 
                               <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
@@ -910,11 +986,15 @@ function toggleReplyContainer(answerID) {
               <span class="button is-primary is-static text-white" style="font-size:12px; padding: 3px; border: 0px; height: 18px; background-color: #00d1b2; border-color: #00d1b2;">Expert</span>
              `
             }
+              let cek_admin = username === 'admin'
               let editReplyHtml = ''
               if (reply['username'] === username) {
                 editReplyHtml = `<a class="dropdown-item" onclick="editReply('${reply['_id']}','${answerID}')"><span>Edit Reply</span></a>
                                 <a class="dropdown-item" onclick="confirmDeleteReply('${reply['_id']}')"><span>Delete Reply</span></a>
                 `;
+                }else if(cek_admin){
+                  editReplyHtml = `<a class="dropdown-item" onclick="confirmDeleteReply('${reply['_id']}')"><span>Delete Reply</span></a>
+                  `;
                 }
               let reply_temp =
                   `
@@ -1025,11 +1105,13 @@ function toggleReplyContainer(answerID) {
              `
             }
               let editAnswerHtml = '';
-
+              let cek_admin = username === 'admin'
               if (answer['username'] === username) {
                 editAnswerHtml = `<a class="dropdown-item" onclick="editAnswer('${answer['_id']}','${postID}')"><span>Edit Answer</span></a>
                                 <a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>
                 `;
+                }else if( cek_admin){
+                  editAnswerHtml = `<a class="dropdown-item" onclick="confirmDeleteAnswer('${answer['_id']}')"><span>Delete Answer</span></a>`
                 }
               let time_before2 = time2str(time_answer);
               let answer_temp =
@@ -1059,7 +1141,7 @@ function toggleReplyContainer(answerID) {
                       <a class="reply-link mx-3"  id="reply_toggle_${answer["_id"]}" onclick="toggleReplyContainer('${answer["_id"]}')">Reply(${count_replies})</a>
                           <div id="reply_${answer["_id"]}" class="reply-container" style="display: none;">
                             
-                            <div class="d-flex flex-row card p-2 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
+                            <div class="d-flex flex-row card p-3 is-shadowless" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249); width: fit-content;">
                               <textarea type="text" id="input-reply-${answer["_id"]}" class="reply-input" style="border: 0px; border-radius: 20px; background-color: rgb(241, 245, 249);" data-answer-id="${answer["_id"]}" placeholder="Type your reply..."></textarea>
                               <button onclick="sendReply('${answer["_id"]}','${postID}','${answer['username']}')" class="button is-primary is-outlined reply-submit" style="border: none !important;" data-answer-id="${answer["_id"]}"><span class="bi bi-send-fill fs-5"></span></button>                            
                             </div>
@@ -1207,10 +1289,11 @@ function confirmDeleteAnswer(answerId) {
       data:{'id_answer':answerId},
       success: function (response) {
           if (response["result"] === "success") {
-              alert(response["msg"]);
+            swal("Success",response["msg"], "success");
             }
           else if(response["result"] === 'failed'){
-            alert(response['msg'])
+            swal("Failed",response["msg"], "error");
+
           }
           
       }
@@ -1242,7 +1325,8 @@ function submitReportAnswer(id_post,answerID) {
     data: reportData,
     success: function(response) {
       // Handle the success response from the server
-      alert(response['msg'])
+      swal("Success",response["msg"], "success");
+
       // Close the modal
       closeModal();
     }
@@ -1287,10 +1371,12 @@ function confirmDeleteReply(replyId) {
       data:{'id_reply':replyId},
       success: function (response) {
           if (response["result"] === "success") {
-              alert(response["msg"]);
+            swal("Success",response["msg"], "success");
+
             }
           else if(response["result"] === 'failed'){
-            alert(response['msg'])
+            swal("Failed",response["msg"], "error");
+
           }
           
       }
@@ -1322,7 +1408,8 @@ function submitReportReply(answerID,replyID) {
     data: reportData,
     success: function(response) {
       // Handle the success response from the server
-      alert(response['msg'])
+      swal("Success",response["msg"], "success");
+
       // Close the modal
       closeModal();
     }
@@ -1352,10 +1439,12 @@ function editing_reply(answerID,text,replyID) {
       processData: false,
       success: function (response) {
           if (response["result"] === "success") {
-              alert(response["msg"]); 
+            swal("Success",response["msg"], "success");
+ 
             }
           else if(response["result"] === 'failed'){
-            alert(response['msg'])
+            swal("Failed",response["msg"], "error");
+
           }
           
       }
@@ -1383,8 +1472,9 @@ function sendReply(answerId, postID, userReplyTo) {
     },
     success: function(response) {
       if (response.result === "success") {
-        alert(response['msg']);
+        swal("Success",response["msg"], "success");
         $(`#reply_toggle_`+answerId).text('reply('+num2str(response["count_replies"])+')');
+        $('#input-reply-'+answerId).val('')
         getReplies_detail(answerId,userReplyTo)
       }
     },

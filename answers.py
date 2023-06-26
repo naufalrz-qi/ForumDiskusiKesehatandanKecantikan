@@ -5,6 +5,7 @@ import jwt
 from datetime import datetime, timedelta
 import hashlib
 from werkzeug.utils import secure_filename
+import pytz
 
 b_answers = Blueprint('answers', __name__)
 
@@ -172,39 +173,46 @@ def delete_answer():
             g.SECRET_KEY, 
             algorithms=["HS256"]
             )
+        username = payload['id']
         user_info = g.db.normal_users.find_one({'username':payload.get('id')})
         user_info2 = g.db.expert_users.find_one({'username':payload.get('id')})
         
 
         id_answer = request.form["id_answer"]
-        
+        answer = g.db.answers.find_one({'_id':ObjectId(id_answer)})
         if user_info:
             if user_info['role'] == 'admin':
+                g.db.answers.delete_one({"_id": ObjectId(id_answer)})
+                send_notifications(answer['id_user'],payload['id'],f'{username} has removed your answer due to the violation you committed','#')
                 return jsonify({
-                    "result": "failed",
-                    "msg": "You're an admin"
-                })
-            else:
-
+                    "result": "success",
+                    "msg": "Answering successfully deleted!"
+                    })
+            elif answer['id_user'] == str(user_info['_id']):
                 g.db.answers.delete_one({"_id": ObjectId(id_answer)})
                 return jsonify({
                     "result": "success",
                     "msg": "Answering successfully deleted!"
                     })
+            else:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "Something went wrong"
+                }) 
         
             
         elif user_info2:
-            if user_info2['role'] == 'admin':
-                return jsonify({
-                    "result": "failed",
-                    "msg": "You're an admin"
-                })
-            else:               
+            if answer['id_user'] == str(user_info2['_id']):               
                 g.db.answers.delete_one({"_id": ObjectId(id_answer)})
                 return jsonify({
                     "result": "success",
                     "msg": "Answering successfully deleted!"
                     })
+            else:
+                return jsonify({
+                    "result": "failed",
+                    "msg": "Something went wrong"
+                }) 
         
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
@@ -290,7 +298,7 @@ def answering():
         answer_receive = request.form["answer_give"]
         id_post = request.form["id_post"]
         date_receive = request.form["date_give"]
-        
+        post = g.db.posts.find_one({'_id':ObjectId(id_post)})
         
         if user_info:
             if user_info['role'] == 'admin':
@@ -317,9 +325,9 @@ def answering():
                 else:
                     doc["answer_pic"] = ''
                     doc["answer_pic_real"] = ''  
-                    
-                # send_notification(id_post,username)
+                
                 g.db.answers.insert_one(doc)
+                send_notifications(post['id_user'],username,f'{username} answered your post',f'/post_detail/{id_post}')
                 return jsonify({
                     "result": "success",
                     "msg": "Answering successful!"
@@ -351,7 +359,7 @@ def answering():
                 else:
                     doc["answer_pic"] = ''
                     doc["answer_pic_real"] = ''  
-                    
+                send_notifications(post['id_user'],username,f'{username} answered your post',f'/post_detail/{id_post}')
                 g.db.answers.insert_one(doc)
                 return jsonify({
                     "result": "success",
@@ -361,11 +369,14 @@ def answering():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("index"))
  
-# def send_notification(id_post,username):
-#     post = g.db.posts.find_one({'_id':ObjectId(id_post)})
-#     doc={
-#         'id_user':post['id_user'],
-#         'link': '/post_detail/'+id_post,
-#         'message':'Your post has been'
-        
-#     }
+def send_notifications(to_user,by_user,message,link):
+    date = datetime.now(pytz.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    doc = {
+        'to_user':to_user,
+        'by_user':by_user,
+        'message':message,
+        'status':'unread',
+        'link':link,
+        'date':date
+    }
+    g.db.notifications.insert_one(doc)

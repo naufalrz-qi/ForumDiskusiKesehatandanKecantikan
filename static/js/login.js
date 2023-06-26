@@ -27,10 +27,12 @@ function sign_in() {
       success: function (response) {
         if (response["result"] === "success") {
           $.cookie("my_token", response["token"], { path: "/" });
-          alert('Login success!')
+          swal("Success","Login successful!", "success");
+
           window.location.replace("/");
         } else {
-          alert(response["msg"]);
+          swal("Failed",response["msg"], "error");
+
         }
       },
     });

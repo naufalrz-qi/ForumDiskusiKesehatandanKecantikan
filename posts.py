@@ -5,6 +5,7 @@ import jwt
 from datetime import datetime, timedelta
 import hashlib
 from werkzeug.utils import secure_filename
+import pytz
 
 b_posts = Blueprint('posts', __name__)
 
@@ -145,22 +146,32 @@ def delete_post(id_post):
                 g.SECRET_KEY,
                 algorithms=['HS256']
             )
+            username = payload['id']
             user_info =g.db.normal_users.find_one({'username':payload.get('id')})
             user_info2 =g.db.expert_users.find_one({'username':payload.get('id')})
             post =g.db.posts.find_one({'_id':ObjectId(id_post)})
             
             if post:
                 if user_info:
-                    if user_info['role'] == 'admin':
-                        return f'<center><h1>You are an admin, you shouldn`t have to post anything</h1><a href="/">Go back to home</a></center>'
-                    else:
+                    if post['id_user'] == str(user_info['_id']):
                         g.db.posts.delete_one({'_id':ObjectId(id_post)})   
                         g.db.answers.delete_many({'id_post':id_post})   
                         return render_template('forum_after.html',user_info=user_info, msg=f'Your post ({post["title"]}) has been deleted')
+                    elif user_info['role'] == 'admin':
+                        g.db.posts.delete_one({'_id':ObjectId(id_post)})   
+                        g.db.answers.delete_many({'id_post':id_post}) 
+                        send_notifications(post['id_user'],payload['id'],f'{username} has removed your post due to the violation you committed','#')
+                        return render_template('forum_after.html',user_info=user_info, msg=f'Your post ({post["title"]}) has been deleted')
+                    else:
+                        return redirect(url_for('index'))
+                    
                 elif user_info2:
-                    g.db.posts.delete_one({'_id':ObjectId(id_post)})
-                    g.db.answers.delete_many({'id_post':id_post})     
-                    return render_template('forum_after.html',user_info=user_info2, msg=f'Your post ({post["title"]}) has been deleted')
+                    if post['id_user'] == str(user_info2['_id']):
+                        g.db.posts.delete_one({'_id':ObjectId(id_post)})
+                        g.db.answers.delete_many({'id_post':id_post})     
+                        return render_template('forum_after.html',user_info=user_info2, msg=f'Your post ({post["title"]}) has been deleted')
+                    else:
+                        return redirect(url_for('index'))
             else:
                 return redirect(url_for('index'))
             
@@ -644,3 +655,14 @@ def submit_report():
     else:
         return redirect(url_for('auth.login'))
    
+def send_notifications(to_user,by_user,message,link):
+    date = datetime.now(pytz.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    doc = {
+        'to_user':to_user,
+        'by_user':by_user,
+        'message':message,
+        'status':'unread',
+        'link':link,
+        'date':date
+    }
+    g.db.notifications.insert_one(doc) 
